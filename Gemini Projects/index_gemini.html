@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stick War Legends - Fix Button Responsiveness</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #111;
+            font-family: Arial, sans-serif;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #mainMenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            color: white;
+            transition: background 0.5s ease;
+        }
+
+        #mainMenu h1 {
+            font-size: 70px;
+            color: #f1c40f;
+            text-shadow: 0 0 20px #e67e22, 3px 3px 10px black;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .menu-box {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 0 30px rgba(241, 196, 15, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        select {
+            font-size: 20px;
+            padding: 12px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 2px solid #34495e;
+            cursor: pointer;
+            background: #ecf0f1;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            padding: 15px 50px;
+            font-size: 26px;
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            transition: 0.2s all;
+            text-transform: uppercase;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.6);
+        }
+
+        .ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #7f8c8d;
+        }
+
+        .command-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+            padding: 12px;
+            border-radius: 12px;
+            border: 2px solid #7f8c8d;
+        }
+
+        .cmd-btn {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #ecf0f1, #bdc3c7);
+            border: 2px solid #7f8c8d;
+            border-radius: 6px;
+            color: #2c3e50;
+            transition: 0.2s;
+            width: 170px;
+            text-align: left;
+        }
+
+        .cmd-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .cmd-btn.active {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+            border-color: #27ae60;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        .skill-btn {
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+            border: 2px solid #732d91;
+            border-radius: 6px;
+            color: white;
+            transition: 0.2s;
+            width: 170px;
+            text-align: center;
+            margin-top: 15px;
+            box-shadow: 0 0 15px #8e44ad;
+            text-transform: uppercase;
+        }
+
+        .skill-btn:hover {
+            filter: brightness(1.2);
+        }
+
+        .skill-btn:active {
+            transform: scale(0.95);
+        }
+
+        .skill-btn:disabled {
+            background: #7f8c8d;
+            border-color: #34495e;
+            color: #bdc3c7;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        button.buy-btn {
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(to bottom, #f1c40f, #d4ac0d);
+            border: 1px solid #b7950b;
+            border-radius: 6px;
+            color: #3e2723;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 170px;
+        }
+
+        button.buy-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        button.buy-btn:active {
+            transform: scale(0.98);
+        }
+
+        button.buy-btn:disabled {
+            background: #7f8c8d;
+            border-color: #34495e;
+            color: #bdc3c7;
+            cursor: not-allowed;
+            filter: none;
+            transform: none;
+        }
+
+        .gold-display {
+            font-size: 22px;
+            font-weight: bold;
+            color: #f1c40f;
+            text-shadow: 2px 2px 4px black;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px black;
+            pointer-events: none;
+            display: none;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="mainMenu">
+        <h1>STICK WAR LEGENDS</h1>
+        <div class="menu-box">
+            <h2 style="margin-top: 0; color: #ecf0f1; text-shadow: 1px 1px 3px black;">CHỌN ĐỘ KHÓ</h2>
+            <select id="difficulty">
+                <option value="easy">🟢 Dễ (Tập sự)</option>
+                <option value="normal" selected>🟡 Bình thường (Chiến binh)</option>
+                <option value="hard">🔴 Khó (Huyền thoại)</option>
+            </select>
+            <br>
+            <button class="start-btn" onclick="startGame()">VÀO TRẬN</button>
+        </div>
+    </div>
+
+    <div class="instructions" id="instructionText">⬅️ ➡️ Di chuyển Camera</div>
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-panel" id="uiPanel">
+        <div class="gold-display" id="goldText">💰 Vàng: 400</div>
+        <button id="btn-buy-miner" class="buy-btn" onclick="spawnUnit('miner', 100)"><span>⛏️ Thợ Mỏ</span>
+            <span>100g</span></button>
+        <button id="btn-buy-warrior" class="buy-btn" onclick="spawnUnit('warrior', 75)"><span>⚔️ Chiến Binh</span>
+            <span>75g</span></button>
+        <button id="btn-buy-archer" class="buy-btn" onclick="spawnUnit('archer', 150)"><span>🏹 Cung Thủ</span>
+            <span>150g</span></button>
+        <button id="btn-buy-spearton" class="buy-btn" onclick="spawnUnit('spearton', 200)"><span>🛡️ Lính Giáo</span>
+            <span>200g</span></button>
+        <button id="btn-buy-magikill" class="buy-btn" onclick="spawnUnit('magikill', 300)"><span>🧙 Pháp Sư</span>
+            <span>300g</span></button>
+        <button id="btn-buy-giant" class="buy-btn" onclick="spawnUnit('giant', 500)"><span>👹 Khổng Lồ</span>
+            <span>500g</span></button>
+    </div>
+
+    <div class="command-panel" id="commandPanel">
+        <button id="btn-retreat" class="cmd-btn" onclick="setCommand('retreat')">🏰 Rút Về Thành</button>
+        <button id="btn-defend" class="cmd-btn" onclick="setCommand('defend')">🛡️ Dàn Binh</button>
+        <button id="btn-attack" class="cmd-btn active" onclick="setCommand('attack')">⚔️ Tấn Công</button>
+
+        <button id="btn-arrow-rain" class="skill-btn" onclick="activateArrowRain()">🌧️ MƯA TÊN</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const goldText = document.getElementById("goldText");
+        const mainMenu = document.getElementById("mainMenu");
+        const uiPanel = document.getElementById("uiPanel");
+        const commandPanel = document.getElementById("commandPanel");
+        const instructionText = document.getElementById("instructionText");
+        const btnArrowRain = document.getElementById("btn-arrow-rain");
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playSound(type, volume = 1.0) {
+            if (audioCtx.state === 'suspended') return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            let now = audioCtx.currentTime;
+            let vol = volume * 0.2;
+
+            if (type === 'attack') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'hit') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'die') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(30, now + 0.4);
+                gain.gain.setValueAtTime(vol * 1.5, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            } else if (type === 'arrow') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
+                gain.gain.setValueAtTime(vol * 0.5, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
+            } else if (type === 'buy') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.setValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(vol, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            }
+        }
+
+        let bgmOsc, bgmGain, lfo, lfoGain;
+        function startBGM() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (bgmOsc) return;
+            bgmOsc = audioCtx.createOscillator();
+            bgmGain = audioCtx.createGain();
+            bgmOsc.type = 'triangle';
+            bgmOsc.frequency.setValueAtTime(120, audioCtx.currentTime);
+            bgmGain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+            lfo = audioCtx.createOscillator();
+            lfo.frequency.value = 2; // Tremolo speed
+            lfoGain = audioCtx.createGain();
+            lfoGain.gain.value = 0.05;
+            lfo.connect(lfoGain);
+            lfoGain.connect(bgmGain.gain);
+            lfo.start();
+
+            bgmOsc.connect(bgmGain);
+            bgmGain.connect(audioCtx.destination);
+            bgmOsc.start();
+        }
+
+        function stopBGM() {
+            if (bgmOsc) { bgmOsc.stop(); bgmOsc.disconnect(); bgmOsc = null; }
+            if (lfo) { lfo.stop(); lfo.disconnect(); lfo = null; }
+        }
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        const mapWidth = 3500;
+        let cameraX = 0; let keys = { ArrowLeft: false, ArrowRight: false };
+        let isPlaying = false; let playerGold = 400; let enemyGold = 400;
+        let units = []; let projectiles = [];
+        let aiInterval; let passiveIncomeInterval; let difficultyMode = 'normal';
+        let botTargetUnit = null; let currentCommand = 'attack';
+
+        let arrowRainCd = 0;
+
+        let unitCooldowns = { miner: 0, warrior: 0, archer: 0, spearton: 0, magikill: 0, giant: 0 };
+        // THỜI GIAN CHỜ MỚI
+        const MAX_COOLDOWNS = { miner: 1, warrior: 1, archer: 2, spearton: 4, magikill: 6, giant: 10 };
+
+        const UNIT_NAMES = { miner: '⛏️ Thợ Mỏ', warrior: '⚔️ Chiến Binh', archer: '🏹 Cung Thủ', spearton: '🛡️ Lính Giáo', magikill: '🧙 Pháp Sư', giant: '👹 Khổng Lồ' };
+        const UNIT_COSTS = { miner: 100, warrior: 75, archer: 150, spearton: 200, magikill: 300, giant: 500 };
+
+        let menuSceneIndex = 0; let menuSceneTimer = null;
+        let menuAlpha = 1; let isFading = false;
+        let lastFrameTime = 0;
+
+        const playerBase = { x: 300, hp: 2000, maxHp: 2000, color: '#3498db', attackCooldown: 0, attackRange: 500, damage: 25 };
+        const enemyBase = { x: mapWidth - 300, hp: 2000, maxHp: 2000, color: '#e74c3c', attackCooldown: 0, attackRange: 500, damage: 25 };
+        const playerMines = [{ x: 800 }, { x: 1200 }];
+        const enemyMines = [{ x: mapWidth - 800 }, { x: mapWidth - 1200 }];
+
+        window.addEventListener('keydown', e => { if (e.key === 'ArrowLeft') keys.ArrowLeft = true; if (e.key === 'ArrowRight') keys.ArrowRight = true; });
+        window.addEventListener('keyup', e => { if (e.key === 'ArrowLeft') keys.ArrowLeft = false; if (e.key === 'ArrowRight') keys.ArrowRight = false; });
+        function getGroundY() { return canvas.height - 120; }
+
+        function setCommand(cmd) {
+            currentCommand = cmd;
+            document.getElementById('btn-retreat').className = cmd === 'retreat' ? 'cmd-btn active' : 'cmd-btn';
+            document.getElementById('btn-defend').className = cmd === 'defend' ? 'cmd-btn active' : 'cmd-btn';
+            document.getElementById('btn-attack').className = cmd === 'attack' ? 'cmd-btn active' : 'cmd-btn';
+        }
+
+        function activateArrowRain() {
+            if (arrowRainCd > 0 || !isPlaying) return;
+            arrowRainCd = 30;
+
+            let enemies = units.filter(u => !u.isPlayer && u.hp > 0);
+            if (enemies.length === 0) enemies.push(enemyBase);
+
+            let totalArrows = 50;
+            for (let i = 0; i < totalArrows; i++) {
+                setTimeout(() => {
+                    let target = enemies[Math.floor(Math.random() * enemies.length)];
+                    if (target.hp <= 0) target = enemyBase;
+                    let spawnX = target.x - 200 - Math.random() * 300;
+                    let spawnY = -200 - Math.random() * 200;
+                    projectiles.push(new Projectile('arrow', spawnX, spawnY, target, 20, 1));
+                    if (i % 5 === 0) playSound('arrow', 0.4);
+                }, i * 60);
+            }
+        }
+
+        class Projectile {
+            constructor(type, x, y, target, damage, dir) {
+                this.type = type; this.x = x; this.y = y; this.target = target;
+                this.damage = damage; this.dir = dir;
+                this.speed = type === 'arrow' ? 18 : 10;
+                this.active = true;
+            }
+            update() {
+                if (!this.active) return;
+                let tx = this.target.x; let ty = getGroundY() - (this.target.maxHp > 1000 ? 120 : 40);
+                let dx = tx - this.x; let dy = ty - this.y; let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < this.speed) {
+                    this.target.hp -= this.damage; if (this.target.hp < 0) this.target.hp = 0; this.active = false;
+                    playSound('hit', 0.5);
+                } else { this.x += (dx / dist) * this.speed; this.y += (dy / dist) * this.speed; }
+            }
+            draw() {
+                if (!this.active) return;
+                let screenX = this.x - cameraX; if (screenX < -50 || screenX > canvas.width + 50) return;
+                ctx.save(); ctx.translate(screenX, this.y);
+                if (this.type === 'arrow') {
+                    let tx = this.target.x - cameraX; let ty = getGroundY() - (this.target.maxHp > 1000 ? 120 : 40);
+                    ctx.rotate(Math.atan2(ty - this.y, tx - screenX));
+                    ctx.strokeStyle = 'black'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.stroke();
+                    ctx.fillStyle = 'silver'; ctx.beginPath(); ctx.moveTo(12, 0); ctx.lineTo(5, -4); ctx.lineTo(5, 4); ctx.fill();
+                } else if (this.type === 'magic') {
+                    ctx.shadowBlur = 15; ctx.shadowColor = '#9b59b6'; ctx.fillStyle = '#8e44ad'; ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+                }
+                ctx.restore();
+            }
+        }
+
+        function drawStickman(x, y, color, isMoving, dir) {
+            ctx.strokeStyle = 'black'; ctx.lineWidth = 3; ctx.fillStyle = color;
+            let headY = y - 65; let bodyTopY = y - 55; let bodyBottomY = y - 30; let legBottomY = y;
+
+            ctx.beginPath(); ctx.arc(x, headY, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(x + 4 * dir, headY - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = 'black'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x + 1 * dir, headY - 6); ctx.lineTo(x + 7 * dir, headY - 1); ctx.stroke();
+            ctx.strokeStyle = 'black'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(x, bodyTopY); ctx.lineTo(x, bodyBottomY); ctx.stroke();
+
+            let legOffset = isMoving ? Math.sin(Date.now() / 120) * 10 : 0;
+            ctx.beginPath();
+            ctx.moveTo(x, bodyBottomY); ctx.lineTo(x - 5 + legOffset, legBottomY);
+            ctx.moveTo(x, bodyBottomY); ctx.lineTo(x + 5 - legOffset, legBottomY);
+            ctx.stroke();
+            return { headX: x, headY: headY, bodyX: x, bodyY: bodyTopY + 10 };
+        }
+
+        class Unit {
+            constructor(type, x, isPlayer) {
+                this.type = type; this.x = x; this.isPlayer = isPlayer; this.color = isPlayer ? '#3498db' : '#e74c3c';
+                this.state = 'moving'; this.goldCarried = 0; this.attackCooldown = 0; this.currentDir = isPlayer ? 1 : -1;
+                this.dead = false; this.deathTimer = 1.0; this.fallAngle = 0;
+
+                if (type === 'miner') { this.speed = 1.8; this.maxHp = 60; this.attack = 0; }
+                else if (type === 'warrior') { this.speed = 2.5; this.maxHp = 120; this.attack = 15; }
+                else if (type === 'archer') { this.speed = 2.2; this.maxHp = 80; this.attack = 12; }
+                else if (type === 'spearton') { this.speed = 1.5; this.maxHp = 500; this.attack = 20; }
+                else if (type === 'magikill') { this.speed = 1.2; this.maxHp = 100; this.attack = 50; }
+                else if (type === 'giant') { this.speed = 0.9; this.maxHp = 1000; this.attack = 60; }
+
+                this.hp = this.maxHp;
+                if (type === 'miner') {
+                    let sideMines = isPlayer ? playerMines : enemyMines;
+                    this.targetMine = sideMines[Math.floor(Math.random() * sideMines.length)];
+                }
+            }
+
+            update() {
+                if (this.hp <= 0) {
+                    if (!this.dead) { this.dead = true; playSound('die', 0.6); }
+                    this.deathTimer -= 0.02;
+                    if (this.currentDir === 1) this.fallAngle = Math.min(Math.PI / 4, this.fallAngle + 0.05);
+                    else this.fallAngle = Math.max(-Math.PI / 4, this.fallAngle - 0.05);
+                    return;
+                }
+
+                if (this.type === 'miner') {
+                    let base = this.isPlayer ? playerBase : enemyBase;
+                    if (this.isPlayer && currentCommand === 'retreat') {
+                        let targetX = base.x - 80;
+                        if (this.x > targetX) { this.x -= this.speed; this.currentDir = -1; this.state = 'moving'; }
+                        else { this.currentDir = 1; this.state = 'idle'; } return;
+                    }
+                    if (this.state === 'idle') this.state = 'moving';
+                    if (this.state === 'moving') {
+                        let dir = this.x < this.targetMine.x ? 1 : -1; this.currentDir = dir;
+                        if (Math.abs(this.x - this.targetMine.x) > 5) this.x += dir * this.speed; else this.state = 'mining';
+                    } else if (this.state === 'mining') {
+                        this.currentDir = this.x < this.targetMine.x ? 1 : -1;
+                        this.goldCarried += 1.0;
+                        if (this.goldCarried >= 50) this.state = 'returning';
+                    } else if (this.state === 'returning') {
+                        let targetX = base.x + (this.isPlayer ? 80 : -80); let dir = this.x < targetX ? 1 : -1; this.currentDir = dir;
+                        if (Math.abs(this.x - targetX) > 5) this.x += dir * this.speed;
+                        else {
+                            if (this.isPlayer) { playerGold += Math.floor(this.goldCarried); updateGoldUI(); } else { enemyGold += Math.floor(this.goldCarried); }
+                            this.goldCarried = 0; this.state = 'moving';
+                        }
+                    } return;
+                }
+
+                if (this.attackCooldown > 0) this.attackCooldown--;
+                let attackRange = 35;
+                if (this.type === 'spearton') attackRange = 45; if (this.type === 'giant') attackRange = 60;
+                if (this.type === 'archer') attackRange = 250; if (this.type === 'magikill') attackRange = 220;
+
+                let targetUnit = null;
+                for (let u of units) { if (u.isPlayer !== this.isPlayer && u.hp > 0 && Math.abs(this.x - u.x) <= attackRange) { targetUnit = u; break; } }
+                let target = targetUnit || (this.isPlayer ? enemyBase : playerBase);
+                let distToBase = Math.abs(this.x - target.x);
+                let baseStopRange = attackRange > 100 ? attackRange - 20 : (this.type === 'giant' ? 80 : 50);
+
+                if (this.isPlayer && currentCommand === 'retreat') {
+                    let targetX = playerBase.x - 80;
+                    if (this.x > targetX) { this.x -= this.speed; this.currentDir = -1; this.state = 'moving'; }
+                    else {
+                        this.currentDir = 1; this.state = 'idle';
+                        if (targetUnit && this.attackCooldown <= 0) {
+                            this.state = 'attacking';
+                            if (this.type === 'archer' || this.type === 'magikill') {
+                                projectiles.push(new Projectile(this.type === 'archer' ? 'arrow' : 'magic', this.x, getGroundY() - 40, targetUnit, this.attack, this.currentDir));
+                                this.attackCooldown = this.type === 'archer' ? 60 : 90;
+                                if (this.type === 'archer') playSound('arrow', 0.5);
+                            } else {
+                                targetUnit.hp -= this.attack; if (targetUnit.hp < 0) targetUnit.hp = 0;
+                                this.attackCooldown = this.type === 'spearton' ? 50 : (this.type === 'giant' ? 70 : 35);
+                                playSound('attack', 0.5); playSound('hit', 0.4);
+                            }
+                        }
+                    }
+                }
+                else if (targetUnit || distToBase <= baseStopRange) {
+                    this.state = targetUnit ? 'attacking' : 'attacking_base'; this.currentDir = this.x < target.x ? 1 : -1;
+                    if (this.attackCooldown <= 0) {
+                        if (this.type === 'archer' || this.type === 'magikill') {
+                            projectiles.push(new Projectile(this.type === 'archer' ? 'arrow' : 'magic', this.x, getGroundY() - 40, target, this.attack, this.currentDir));
+                            this.attackCooldown = this.type === 'archer' ? 60 : 90;
+                            if (this.type === 'archer') playSound('arrow', 0.5);
+                        } else {
+                            target.hp -= this.attack; if (target.hp < 0) target.hp = 0;
+                            this.attackCooldown = this.type === 'spearton' ? 50 : (this.type === 'giant' ? 70 : 35);
+                            playSound('attack', 0.5); playSound('hit', 0.4);
+                        }
+                    }
+                }
+                else {
+                    if (this.isPlayer && currentCommand === 'defend') {
+                        let lineX = playerBase.x + 400;
+                        if (this.x > lineX + 10) { this.x -= this.speed; this.currentDir = -1; this.state = 'moving'; }
+                        else if (this.x < lineX - 10) { this.x += this.speed; this.currentDir = 1; this.state = 'moving'; }
+                        else { this.currentDir = 1; this.state = 'idle'; }
+                    } else {
+                        this.currentDir = this.isPlayer ? 1 : -1; this.x += this.currentDir * this.speed; this.state = 'moving';
+                    }
+                }
+            }
+
+            draw() {
+                let groundY = getGroundY(); let screenX = this.x - cameraX;
+                if (screenX < -150 || screenX > canvas.width + 150) return;
+                let isMoving = this.state === 'moving' || this.state === 'returning'; let dir = this.currentDir;
+                let scaleSize = 1; if (this.type === 'spearton') scaleSize = 1.25; if (this.type === 'giant') scaleSize = 2.5;
+
+                ctx.save();
+                if (this.dead) ctx.globalAlpha = Math.max(0, this.deathTimer);
+                ctx.translate(screenX, groundY);
+                if (this.dead) ctx.rotate(this.fallAngle);
+                ctx.scale(scaleSize, scaleSize); ctx.translate(-screenX, -groundY);
+                let bodyColor = this.type === 'giant' ? '#bdc3c7' : this.color;
+                let joints = drawStickman(screenX, groundY, bodyColor, isMoving, dir);
+
+                if (this.type === 'miner') {
+                    ctx.fillStyle = '#8D6E63'; ctx.beginPath();
+                    let bagW = 8 + (this.goldCarried / 50) * 16; let bagH = 12 + (this.goldCarried / 50) * 16;
+                    ctx.ellipse(screenX - (12 * dir), joints.bodyY - 5, bagW / 2, bagH / 2, (dir === 1 ? -0.2 : 0.2), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                }
+
+                if (this.type === 'warrior') { ctx.fillStyle = '#CFD8DC'; ctx.beginPath(); ctx.arc(joints.headX, joints.headY - 3, 11, Math.PI, 0); ctx.fill(); ctx.stroke(); }
+                else if (this.type === 'archer') { ctx.fillStyle = '#795548'; ctx.beginPath(); ctx.arc(joints.headX, joints.headY - 2, 10, Math.PI, 0); ctx.fill(); ctx.stroke(); }
+                else if (this.type === 'spearton') { ctx.fillStyle = '#FFC107'; ctx.beginPath(); ctx.arc(joints.headX, joints.headY - 3, 12, Math.PI, 0); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#e74c3c'; ctx.fillRect(joints.headX - 8, joints.headY - 20, 16, 6); }
+                else if (this.type === 'magikill') { ctx.fillStyle = '#8e44ad'; ctx.beginPath(); ctx.moveTo(joints.headX - 12, joints.headY - 5); ctx.lineTo(joints.headX + 12, joints.headY - 5); ctx.lineTo(joints.headX, joints.headY - 30); ctx.fill(); ctx.stroke(); ctx.fillStyle = 'white'; ctx.beginPath(); ctx.moveTo(joints.headX - 8, joints.headY + 5); ctx.lineTo(joints.headX + 8, joints.headY + 5); ctx.lineTo(joints.headX, joints.headY + 20); ctx.fill(); }
+                else if (this.type === 'giant') { ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(joints.headX - 10, joints.headY - 5); ctx.lineTo(joints.headX + 10, joints.headY + 5); ctx.stroke(); }
+
+                let armAngle = 0; let thrustX = 0;
+                if (this.type === 'miner' && this.state === 'mining') armAngle = Math.sin(Date.now() / 100) * (Math.PI / 3) - (Math.PI / 6);
+                else if ((this.state === 'attacking' || this.state === 'attacking_base')) {
+                    if (this.type === 'giant') { if (this.attackCooldown > 40) armAngle = -Math.PI / 3; else if (this.attackCooldown > 15) armAngle = Math.PI / 2.5; }
+                    else if (this.type === 'warrior') { if (this.attackCooldown > 20) armAngle = -Math.PI / 4; else if (this.attackCooldown > 10) armAngle = Math.PI / 3; }
+                    else if (this.type === 'spearton') { if (this.attackCooldown > 30) thrustX = -12; else if (this.attackCooldown > 10) thrustX = 30; }
+                }
+
+                ctx.save(); ctx.translate(joints.bodyX, joints.bodyY); ctx.scale(dir, 1); ctx.rotate(armAngle);
+                if (this.type === 'miner') { ctx.strokeStyle = '#5D4037'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(15, 8); ctx.stroke(); ctx.strokeStyle = '#B0BEC5'; ctx.beginPath(); ctx.moveTo(10, -6); ctx.lineTo(20, 18); ctx.stroke(); }
+                else if (this.type === 'warrior') { ctx.strokeStyle = '#CFD8DC'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(28, 0); ctx.stroke(); ctx.strokeStyle = '#455A64'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(6, -6); ctx.lineTo(6, 6); ctx.stroke(); }
+                else if (this.type === 'spearton') { ctx.save(); ctx.translate(thrustX, 0); ctx.strokeStyle = '#795548'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-10, 5); ctx.lineTo(35, 5); ctx.stroke(); ctx.strokeStyle = 'silver'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(35, 5); ctx.lineTo(50, 5); ctx.stroke(); ctx.restore(); ctx.fillStyle = '#FFC107'; ctx.beginPath(); ctx.arc(5, 5, 15, -Math.PI / 2, Math.PI / 2); ctx.fill(); ctx.stroke(); }
+                else if (this.type === 'archer') { ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(10, -20); ctx.quadraticCurveTo(0, 0, 10, 20); ctx.stroke(); ctx.strokeStyle = '#FFF8E1'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(10, -20); if ((this.state === 'attacking' || this.state === 'attacking_base') && this.attackCooldown > 30) { ctx.lineTo(-5, 0); ctx.lineTo(10, 20); ctx.strokeStyle = 'black'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(15, 0); ctx.stroke(); } else ctx.lineTo(10, 20); ctx.stroke(); }
+                else if (this.type === 'magikill') { ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(10, 20); ctx.lineTo(10, -20); ctx.stroke(); ctx.fillStyle = '#9b59b6'; if (this.state.includes('attack')) { ctx.shadowBlur = 10; ctx.shadowColor = '#8e44ad'; } ctx.beginPath(); ctx.arc(10, -22, 6, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; }
+                else if (this.type === 'giant') { ctx.lineCap = 'round'; ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(0, 5); ctx.lineTo(25, 5); ctx.stroke(); ctx.strokeStyle = '#4e342e'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(20, 5); ctx.lineTo(38, 5); ctx.stroke(); ctx.lineCap = 'butt'; }
+                ctx.restore();
+
+                if (!this.dead) {
+                    let hpOffset = 95; if (this.type === 'giant') hpOffset = 110;
+                    ctx.fillStyle = 'red'; ctx.fillRect(screenX - 15, groundY - hpOffset, 30, 5);
+                    ctx.fillStyle = '#2ecc71'; ctx.fillRect(screenX - 15, groundY - hpOffset, 30 * (this.hp / this.maxHp), 5);
+                    ctx.strokeStyle = 'black'; ctx.lineWidth = 1; ctx.strokeRect(screenX - 15, groundY - hpOffset, 30, 5);
+                }
+                ctx.restore();
+            }
+        }
+
+        function drawMenuScene(index) {
+            let cx = canvas.width / 2; let cy = getGroundY(); let animTime = Date.now();
+            if (isFading) { menuAlpha -= 0.05; if (menuAlpha <= 0) { isFading = false; menuAlpha = 0; } } else if (menuAlpha < 1) { menuAlpha += 0.05; }
+            ctx.globalAlpha = menuAlpha; ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            switch (index) {
+                case 0:
+                    let sky0 = ctx.createLinearGradient(0, 0, 0, canvas.height); sky0.addColorStop(0, '#e67e22'); sky0.addColorStop(1, '#f1c40f');
+                    ctx.fillStyle = sky0; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#27ae60'; ctx.fillRect(0, cy, canvas.width, canvas.height - cy);
+                    for (let i = 0; i < 3; i++) {
+                        let offset = Math.sin(animTime / 200 + i) * 5;
+                        drawStickman(cx - 350 - i * 60, cy + offset, '#3498db', false, 1);
+                        drawStickman(cx + 350 + i * 60, cy + offset, '#e74c3c', false, -1);
+                        ctx.strokeStyle = '#CFD8DC'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx - 350 - i * 60, cy - 45 + offset); ctx.lineTo(cx - 320 - i * 60, cy - 45 + offset); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(cx + 350 + i * 60, cy - 45 + offset); ctx.lineTo(cx + 320 + i * 60, cy - 45 + offset); ctx.stroke();
+                    } break;
+                case 1:
+                    let sky1 = ctx.createLinearGradient(0, 0, 0, canvas.height); sky1.addColorStop(0, '#0a0a2a'); sky1.addColorStop(1, '#1a1a4a');
+                    ctx.fillStyle = sky1; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#0f2a1a'; ctx.fillRect(0, cy, canvas.width, canvas.height - cy);
+                    ctx.strokeStyle = 'white'; ctx.lineWidth = 2;
+                    for (let i = 0; i < 30; i++) {
+                        let arrowX = (animTime * 0.5 + i * 100) % (canvas.width + 200) - 100; let arrowY = ((arrowX - cx) * 0.5) + cy - 200;
+                        ctx.beginPath(); ctx.moveTo(arrowX, arrowY); ctx.lineTo(arrowX + 15, arrowY + 7); ctx.stroke();
+                    } drawStickman(cx - 300, cy, '#3498db', false, 1); break;
+                case 2:
+                    let sky2 = ctx.createRadialGradient(cx + 300, cy - 100, 50, cx + 300, cy - 100, 600); sky2.addColorStop(0, '#8e44ad'); sky2.addColorStop(1, '#2c3e50');
+                    ctx.fillStyle = sky2; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#27ae60'; ctx.fillRect(0, cy, canvas.width, canvas.height - cy);
+                    ctx.fillStyle = 'white';
+                    for (let i = 0; i < 15; i++) { let px = cx + 200 + Math.random() * 200; let py = cy - (animTime / 10 + i * 20) % 200; ctx.beginPath(); ctx.arc(px, py, Math.random() * 3, 0, Math.PI * 2); ctx.fill(); }
+                    drawStickman(cx + 300, cy, '#e74c3c', false, -1); ctx.fillStyle = '#8e44ad'; ctx.beginPath(); ctx.moveTo(cx + 300 - 12, cy - 70); ctx.lineTo(cx + 300 + 12, cy - 70); ctx.lineTo(cx + 300, cy - 95); ctx.fill(); break;
+                case 3:
+                    let sky3 = ctx.createLinearGradient(0, 0, 0, canvas.height); sky3.addColorStop(0, '#550000'); sky3.addColorStop(1, '#111');
+                    ctx.fillStyle = sky3; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#331111'; ctx.fillRect(0, cy, canvas.width, canvas.height - cy);
+                    ctx.save(); ctx.translate(cx - 300, cy); ctx.scale(3, 3); ctx.translate(-(cx - 300), -cy); drawStickman(cx - 300, cy, '#bdc3c7', false, 1); ctx.fillStyle = 'red'; ctx.beginPath(); ctx.arc(cx - 300 + 4, cy - 67, 1.5, 0, Math.PI * 2); ctx.fill(); ctx.restore(); break;
+                case 4:
+                    ctx.fillStyle = '#3e2723'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#5D4037'; ctx.beginPath(); ctx.arc(cx - 300, cy, 200, Math.PI, 0); ctx.fill(); ctx.beginPath(); ctx.arc(cx + 300, cy, 200, Math.PI, 0); ctx.fill();
+                    let goldGlow = Math.abs(Math.sin(animTime / 300)); ctx.fillStyle = `rgba(241, 196, 15, ${0.5 + goldGlow * 0.5})`; ctx.beginPath(); ctx.arc(cx - 300, cy - 50, 40, 0, Math.PI * 2); ctx.fill();
+                    drawStickman(cx - 350, cy, '#3498db', true, 1); drawStickman(cx + 250, cy, '#e74c3c', true, -1); break;
+                case 5:
+                    let sky4 = ctx.createLinearGradient(0, 0, 0, canvas.height); sky4.addColorStop(0, '#2980b9'); sky4.addColorStop(1, '#ecf0f1');
+                    ctx.fillStyle = sky4; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#27ae60'; ctx.fillRect(0, cy, canvas.width, canvas.height - cy);
+                    ctx.fillStyle = '#FFC107'; ctx.beginPath(); ctx.arc(cx + 300, cy - 50, 80, -Math.PI / 2, Math.PI / 2); ctx.fill(); ctx.stroke(); drawStickman(cx + 300 - 20, cy, '#3498db', false, 1); ctx.fillStyle = '#FFC107'; ctx.beginPath(); ctx.arc(cx + 300 - 20, cy - 68, 12, Math.PI, 0); ctx.fill(); ctx.stroke(); break;
+            }
+            ctx.globalAlpha = 1;
+        }
+
+        function updateBaseDefenses() {
+            function processBase(base, isPlayer) {
+                if (base.hp <= 0) return;
+                if (base.attackCooldown > 0) base.attackCooldown--;
+                if (base.attackCooldown <= 0) {
+                    let target = null; let minDist = base.attackRange;
+                    for (let u of units) {
+                        if (u.isPlayer !== isPlayer && u.hp > 0) {
+                            let dist = Math.abs(u.x - base.x); let inFront = isPlayer ? (u.x > base.x) : (u.x < base.x);
+                            if (inFront && dist <= minDist) { target = u; minDist = dist; }
+                        }
+                    }
+                    if (target) {
+                        let dir = isPlayer ? 1 : -1;
+                        projectiles.push(new Projectile('arrow', base.x, getGroundY() - 150, target, base.damage, dir));
+                        base.attackCooldown = 50;
+                        playSound('arrow', 0.5);
+                    }
+                }
+            }
+            processBase(playerBase, true); processBase(enemyBase, false);
+        }
+
+        function drawStatue(base, title) {
+            let groundY = getGroundY(); let screenX = base.x - cameraX;
+            if (screenX < -150 || screenX > canvas.width + 150) return;
+            let stoneGrad = ctx.createLinearGradient(screenX, groundY - 180, screenX, groundY);
+            stoneGrad.addColorStop(0, '#90A4AE'); stoneGrad.addColorStop(1, '#37474F');
+            ctx.fillStyle = stoneGrad; ctx.fillRect(screenX - 40, groundY - 40, 80, 40); ctx.fillRect(screenX - 30, groundY - 160, 60, 120);
+            ctx.fillStyle = '#455A64'; ctx.beginPath(); ctx.moveTo(screenX - 50, groundY - 160); ctx.lineTo(screenX + 50, groundY - 160); ctx.lineTo(screenX, groundY - 200); ctx.fill();
+            ctx.fillStyle = base.color; ctx.fillRect(screenX - 5, groundY - 230, 10, 30);
+            ctx.beginPath(); ctx.moveTo(screenX + 5, groundY - 230); ctx.lineTo(screenX + 35, groundY - 215); ctx.lineTo(screenX + 5, groundY - 200); ctx.fill();
+
+            if (isPlaying) {
+                ctx.fillStyle = 'black'; ctx.fillRect(screenX - 50, groundY - 250, 100, 12);
+                ctx.fillStyle = base.hp < base.maxHp * 0.3 ? '#e74c3c' : '#2ecc71'; ctx.fillRect(screenX - 50, groundY - 250, 100 * (base.hp / base.maxHp), 12);
+                ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.strokeRect(screenX - 50, groundY - 250, 100, 12);
+                ctx.fillStyle = 'white'; ctx.font = 'bold 18px Arial'; ctx.textAlign = 'center'; ctx.fillText(title, screenX, groundY - 265); ctx.textAlign = 'start';
+            }
+            let dir = base === playerBase ? 1 : -1; ctx.fillStyle = '#111'; ctx.fillRect(screenX + (15 * dir), groundY - 140, 5, 15);
+        }
+
+        function drawRuggedMines() {
+            let groundY = getGroundY();
+            [...playerMines, ...enemyMines].forEach(mine => {
+                let screenX = mine.x - cameraX; if (screenX < -100 || screenX > canvas.width + 100) return;
+                ctx.fillStyle = '#5D4037'; ctx.beginPath();
+                ctx.moveTo(screenX - 50, groundY); ctx.lineTo(screenX - 40, groundY - 30); ctx.lineTo(screenX - 20, groundY - 50); ctx.lineTo(screenX + 10, groundY - 45); ctx.lineTo(screenX + 40, groundY - 20); ctx.lineTo(screenX + 55, groundY); ctx.fill();
+                ctx.strokeStyle = '#FFD54F'; ctx.lineWidth = 4; ctx.beginPath();
+                ctx.moveTo(screenX - 30, groundY - 10); ctx.lineTo(screenX - 10, groundY - 35); ctx.moveTo(screenX, groundY - 40); ctx.lineTo(screenX + 20, groundY - 25); ctx.moveTo(screenX + 10, groundY - 15); ctx.lineTo(screenX + 30, groundY - 5); ctx.stroke();
+            });
+        }
+
+        function drawEnvironment() {
+            let groundY = getGroundY();
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height); skyGrad.addColorStop(0, '#2980b9'); skyGrad.addColorStop(1, '#87CEEB');
+            ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#27ae60'; ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+            ctx.fillStyle = '#2ecc71'; ctx.fillRect(0, groundY, canvas.width, 15);
+        }
+
+        function updateCamera() {
+            if (keys.ArrowLeft) cameraX -= 25; if (keys.ArrowRight) cameraX += 25;
+            if (cameraX < 0) cameraX = 0; if (cameraX > mapWidth - canvas.width) cameraX = mapWidth - canvas.width;
+        }
+
+        function spawnUnit(type, cost) {
+            if (playerGold >= cost && unitCooldowns[type] <= 0) {
+                playerGold -= cost;
+                units.push(new Unit(type, playerBase.x + 80, true));
+                unitCooldowns[type] = MAX_COOLDOWNS[type];
+                updateGoldUI();
+                playSound('buy', 0.7);
+            }
+        }
+
+        function updateGoldUI() { goldText.innerText = `💰 Vàng: ${playerGold}`; }
+
+        function updateBuyButtons() {
+            const types = ['miner', 'warrior', 'archer', 'spearton', 'magikill', 'giant'];
+            for (let type of types) {
+                let btn = document.getElementById('btn-buy-' + type);
+                let cost = UNIT_COSTS[type];
+                let name = UNIT_NAMES[type];
+                let newHTML = "";
+                let shouldDisable = false;
+
+                if (unitCooldowns[type] > 0) {
+                    shouldDisable = true;
+                    newHTML = `<span>⏳ ${Math.ceil(unitCooldowns[type])}s</span> <span>${cost}g</span>`;
+                } else {
+                    if (playerGold >= cost) {
+                        shouldDisable = false;
+                        newHTML = `<span>${name}</span> <span>${cost}g</span>`;
+                    } else {
+                        shouldDisable = true;
+                        newHTML = `<span>${name}</span> <span style="color:#e74c3c">${cost}g</span>`;
+                    }
+                }
+
+                // FIX LỖI "KHÔNG NHẠY": Chỉ cập nhật DOM nếu nội dung nút bấm thật sự thay đổi
+                if (btn.disabled !== shouldDisable) btn.disabled = shouldDisable;
+                if (btn.innerHTML !== newHTML) btn.innerHTML = newHTML;
+            }
+        }
+
+        function runEnemyAI() {
+            if (!isPlaying) return;
+            let eMiners = units.filter(u => !u.isPlayer && u.type === 'miner' && u.hp > 0).length;
+            let maxMiners = difficultyMode === 'easy' ? 3 : 5;
+
+            if (eMiners < maxMiners) {
+                if (enemyGold >= 100) { enemyGold -= 100; units.push(new Unit('miner', enemyBase.x - 80, false)); }
+                return;
+            }
+            let enemiesNearBase = units.filter(u => u.isPlayer && u.hp > 0 && u.x > enemyBase.x - 500).length;
+            if (enemiesNearBase > 0 && enemyGold >= 75) {
+                if (enemyGold >= 200) { enemyGold -= 200; units.push(new Unit('spearton', enemyBase.x - 80, false)); }
+                else if (enemyGold >= 150) { enemyGold -= 150; units.push(new Unit('archer', enemyBase.x - 80, false)); }
+                else if (enemyGold >= 75) { enemyGold -= 75; units.push(new Unit('warrior', enemyBase.x - 80, false)); }
+                botTargetUnit = null; return;
+            }
+            if (!botTargetUnit) {
+                let r = Math.random();
+                if (r < 0.20) botTargetUnit = { type: 'giant', cost: 500 };
+                else if (r < 0.45) botTargetUnit = { type: 'magikill', cost: 300 };
+                else if (r < 0.75) botTargetUnit = { type: 'spearton', cost: 200 };
+                else if (r < 0.90) botTargetUnit = { type: 'archer', cost: 150 };
+                else botTargetUnit = { type: 'warrior', cost: 75 };
+            }
+            if (enemyGold >= botTargetUnit.cost) {
+                enemyGold -= botTargetUnit.cost; units.push(new Unit(botTargetUnit.type, enemyBase.x - 80, false)); botTargetUnit = null;
+            }
+        }
+
+        function startGame() {
+            difficultyMode = document.getElementById("difficulty").value;
+            mainMenu.style.display = "none"; uiPanel.style.display = "flex"; commandPanel.style.display = "flex"; instructionText.style.display = "block";
+
+            playerGold = 400; enemyGold = 400; units = []; projectiles = []; botTargetUnit = null;
+            playerBase.hp = playerBase.maxHp; enemyBase.hp = enemyBase.maxHp; cameraX = 0; arrowRainCd = 0;
+
+            for (let type in unitCooldowns) unitCooldowns[type] = 0;
+
+            setCommand('attack'); updateGoldUI(); isPlaying = true;
+
+            startBGM();
+
+            let aiTickRate = 1200; if (difficultyMode === 'easy') aiTickRate = 2000; if (difficultyMode === 'hard') aiTickRate = 800;
+            clearInterval(aiInterval); aiInterval = setInterval(runEnemyAI, aiTickRate);
+
+            clearInterval(passiveIncomeInterval);
+            passiveIncomeInterval = setInterval(() => {
+                if (isPlaying) { playerGold += 50; enemyGold += 50; updateGoldUI(); goldText.style.color = 'white'; setTimeout(() => goldText.style.color = '#f1c40f', 500); }
+            }, 30000);
+
+            clearInterval(menuSceneTimer);
+        }
+
+        function endGame(message, color) {
+            isPlaying = false; clearInterval(aiInterval); clearInterval(passiveIncomeInterval);
+            stopBGM();
+            ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = color; ctx.font = 'bold 60px Arial'; ctx.textAlign = 'center'; ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+            setTimeout(() => {
+                mainMenu.style.display = "flex"; uiPanel.style.display = "none"; commandPanel.style.display = "none"; instructionText.style.display = "none";
+                startMenuCinematic();
+            }, 3000);
+        }
+
+        function gameLoop(timestamp) {
+            requestAnimationFrame(gameLoop);
+            if (!timestamp) timestamp = performance.now();
+            if (timestamp - lastFrameTime < 16) return;
+            lastFrameTime = timestamp;
+
+            if (!isPlaying) {
+                drawMenuScene(menuSceneIndex);
+                return;
+            }
+
+            if (arrowRainCd > 0) {
+                arrowRainCd -= 1 / 60;
+                let newText = `⏳ MƯA TÊN (${Math.ceil(arrowRainCd)}s)`;
+                if (btnArrowRain.innerText !== newText) btnArrowRain.innerText = newText;
+                if (!btnArrowRain.disabled) btnArrowRain.disabled = true;
+            } else {
+                let newText = `🌧️ MƯA TÊN`;
+                if (btnArrowRain.innerText !== newText) btnArrowRain.innerText = newText;
+                if (btnArrowRain.disabled) btnArrowRain.disabled = false;
+            }
+
+            for (let type in unitCooldowns) {
+                if (unitCooldowns[type] > 0) unitCooldowns[type] -= 1 / 60;
+            }
+            updateBuyButtons();
+
+            updateCamera(); ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawEnvironment(); drawRuggedMines(); drawStatue(playerBase, "THÀNH TRÌ CỦA BẠN"); drawStatue(enemyBase, "CĂN CỨ ĐỊCH");
+            updateBaseDefenses();
+            units = units.filter(u => u.hp > 0 || u.deathTimer > 0); units.forEach(unit => { unit.update(); unit.draw(); });
+            projectiles = projectiles.filter(p => p.active); projectiles.forEach(p => { p.update(); p.draw(); });
+
+            if (enemyBase.hp <= 0) endGame("CHIẾN THẮNG OANH LIỆT!", '#2ecc71');
+            else if (playerBase.hp <= 0) endGame("THẤT BẠI THẢM HẠI...", '#e74c3c');
+        }
+
+        function startMenuCinematic() {
+            clearInterval(menuSceneTimer);
+            menuSceneTimer = setInterval(() => {
+                isFading = true;
+                setTimeout(() => { menuSceneIndex = (menuSceneIndex + 1) % 6; }, 500);
+            }, 10000);
+        }
+
+        startMenuCinematic();
+        requestAnimationFrame(gameLoop);
+
+    </script>
+</body>
+
+</html>

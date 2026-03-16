@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lovely Cat - Interactive Care</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- TỔNG QUAN --- */
+        * { box-sizing: border-box; touch-action: none; /* Ngăn scroll màn hình khi chà xát */ }
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            font-family: 'Nunito', sans-serif;
+            overflow: hidden;
+        }
+
+        #game-app {
+            background: #ffffff;
+            width: 360px; height: 700px;
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15), inset 0 0 0 10px #f0f4f8;
+            display: flex; flex-direction: column;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+        /* --- THANH CHỈ SỐ --- */
+        .stats-container { display: flex; flex-direction: column; gap: 12px; z-index: 10; }
+        .stat-row { display: flex; align-items: center; gap: 10px; font-weight: 800; color: #555; }
+        .stat-icon { font-size: 20px; width: 25px; text-align: center; }
+        .progress-bg {
+            flex: 1; background: #e0e5ec; height: 16px; border-radius: 10px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; border-radius: 10px; transition: width 0.2s, background-color 0.4s; }
+
+        /* --- KHU VỰC THÚ CƯNG --- */
+        #pet-stage {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            position: relative; margin: 20px 0;
+            background: radial-gradient(circle, #fff9e6 0%, transparent 70%);
+            border-radius: 30px;
+            cursor: pointer; /* Đổi chuột khi có thể tương tác */
+        }
+        
+        #hint-text {
+            position: absolute; top: 10px; left: 0; width: 100%; text-align: center;
+            color: #888; font-size: 14px; font-weight: bold; opacity: 0;
+            transition: opacity 0.3s; pointer-events: none;
+        }
+
+        /* SVG Mèo */
+        @keyframes breathe { 0%, 100% { transform: scaleY(1) translateY(0); } 50% { transform: scaleY(1.02) translateY(-5px); } }
+        @keyframes blink { 0%, 95%, 98%, 100% { transform: scaleY(1); } 96%, 99% { transform: scaleY(0.1); } }
+        .cat-svg { width: 220px; height: 220px; animation: breathe 3s infinite ease-in-out; filter: drop-shadow(0 15px 15px rgba(0,0,0,0.1)); pointer-events: none; }
+        .cat-eyes { animation: blink 4s infinite linear; transform-origin: center; }
+
+        /* --- NÚT HÀNH ĐỘNG --- */
+        .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; z-index: 10;}
+        button {
+            background: #fff; border: 2px solid transparent;
+            padding: 15px 0; border-radius: 20px;
+            font-size: 28px; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        button span { font-size: 12px; font-weight: 800; color: #777; }
+        
+        /* Hiệu ứng khi được chọn (Active) */
+        button.active { transform: translateY(5px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 2px solid #555; }
+        #btn-feed { border-bottom: 4px solid #ffb3ba; } #btn-feed.active { background: #ffb3ba; }
+        #btn-play { border-bottom: 4px solid #baffc9; } #btn-play.active { background: #baffc9; }
+        #btn-bathe { border-bottom: 4px solid #bae1ff; } #btn-bathe.active { background: #bae1ff; }
+
+        /* --- HIỆU ỨNG HẠT VÀ TƯƠNG TÁC --- */
+        .interaction-item {
+            position: absolute; pointer-events: none; transform: translate(-50%, -50%); z-index: 20;
+        }
+        
+        /* Đồ ăn rơi vào miệng mèo */
+        @keyframes dropFood {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            80% { transform: translate(-50%, 80px) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, 100px) scale(0); opacity: 0; }
+        }
+        .food-item { font-size: 30px; animation: dropFood 0.8s ease-in forwards; }
+        
+        /* Bọt xà phòng */
+        @keyframes popBubble {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -100px) scale(1.5); opacity: 0; }
+        }
+        .bubble-item { font-size: 24px; animation: popBubble 1s ease-out forwards; }
+        
+        /* Đồ chơi / Len */
+        @keyframes fadeToy {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+        }
+        .toy-item { font-size: 20px; animation: fadeToy 0.5s linear forwards; }
+
+    </style>
+</head>
+<body>
+
+    <div id="game-app">
+        <div class="stats-container">
+            <div class="stat-row">
+                <div class="stat-icon">🍖</div>
+                <div class="progress-bg"><div id="bar-food" class="progress-fill" style="width: 100%; background: #ffb3ba;"></div></div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-icon">🎾</div>
+                <div class="progress-bg"><div id="bar-fun" class="progress-fill" style="width: 100%; background: #baffc9;"></div></div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-icon">🛁</div>
+                <div class="progress-bg"><div id="bar-clean" class="progress-fill" style="width: 100%; background: #bae1ff;"></div></div>
+            </div>
+        </div>
+
+        <div id="pet-stage">
+            <div id="hint-text">Chọn một hành động!</div>
+            <svg id="cat" class="cat-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 140 160 Q 180 180 170 130 Q 160 80 180 100" fill="none" stroke="#F5F5F5" stroke-width="20" stroke-linecap="round"/>
+                <rect x="50" y="80" width="100" height="90" rx="40" fill="#F5F5F5"/>
+                <path d="M 55 85 L 40 30 L 90 60 Z" fill="#F5F5F5"/> <path d="M 58 80 L 48 45 L 80 65 Z" fill="#FFC0CB"/>
+                <path d="M 145 85 L 160 30 L 110 60 Z" fill="#F5F5F5"/> <path d="M 142 80 L 152 45 L 120 65 Z" fill="#FFC0CB"/>
+                <ellipse cx="100" cy="85" rx="55" ry="45" fill="#F5F5F5"/>
+                <g class="cat-eyes">
+                    <circle cx="75" cy="80" r="7" fill="#333"/> <circle cx="73" cy="78" r="2" fill="#FFF"/>
+                    <circle cx="125" cy="80" r="7" fill="#333"/> <circle cx="123" cy="78" r="2" fill="#FFF"/>
+                </g>
+                <ellipse cx="60" cy="95" rx="8" ry="4" fill="#FFB6C1" opacity="0.6"/>
+                <ellipse cx="140" cy="95" rx="8" ry="4" fill="#FFB6C1" opacity="0.6"/>
+                <polygon points="97,95 103,95 100,98" fill="#FF69B4"/>
+                <path d="M 90 100 Q 95 105 100 100 Q 105 105 110 100" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                <rect x="65" y="160" width="20" height="25" rx="10" fill="#E8E8E8"/>
+                <rect x="115" y="160" width="20" height="25" rx="10" fill="#E8E8E8"/>
+            </svg>
+        </div>
+
+        <div class="actions">
+            <button id="btn-feed">🐟<span>CHO ĂN</span></button>
+            <button id="btn-play">🧶<span>CHƠI</span></button>
+            <button id="btn-bathe">🧽<span>TẮM</span></button>
+        </div>
+    </div>
+
+    <script>
+        class InteractivePetGame {
+            constructor() {
+                this.stats = { food: 50, fun: 50, clean: 50 }; // Bắt đầu ở mức 50 để dễ thấy hiệu ứng tăng
+                this.bars = {
+                    food: document.getElementById('bar-food'),
+                    fun: document.getElementById('bar-fun'),
+                    clean: document.getElementById('bar-clean')
+                };
+                this.stage = document.getElementById('pet-stage');
+                this.hintText = document.getElementById('hint-text');
+                
+                this.currentMode = null; // 'feed', 'play', 'bathe'
+                this.isPointerDown = false;
+                this.lastSpawnTime = 0;
+
+                this.bindButtons();
+                this.bindInteractions();
+                this.startGameLoop();
+                this.updateUI();
+            }
+
+            // --- XỬ LÝ NÚT BẤM (CHỌN CÔNG CỤ) ---
+            bindButtons() {
+                const buttons = {
+                    'feed': document.getElementById('btn-feed'),
+                    'play': document.getElementById('btn-play'),
+                    'bathe': document.getElementById('btn-bathe')
+                };
+
+                const hints = {
+                    'feed': 'Chạm vào màn hình để thả thức ăn!',
+                    'play': 'Chạm và di chuyển để vờn cuộn len!',
+                    'bathe': 'Chà xát lên mèo để tắm bọt biển!'
+                };
+
+                for (let mode in buttons) {
+                    buttons[mode].onclick = () => {
+                        // Nếu bấm lại nút đang active thì hủy chế độ
+                        if (this.currentMode === mode) {
+                            this.currentMode = null;
+                            buttons[mode].classList.remove('active');
+                            this.hintText.style.opacity = '0';
+                            this.stage.style.cursor = 'default';
+                        } else {
+                            // Xóa active cũ, thêm active mới
+                            Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+                            this.currentMode = mode;
+                            buttons[mode].classList.add('active');
+                            
+                            // Hiển thị gợi ý
+                            this.hintText.innerText = hints[mode];
+                            this.hintText.style.opacity = '1';
+                            
+                            // Đổi trỏ chuột cho phù hợp (trên PC)
+                            if(mode === 'bathe') this.stage.style.cursor = 'crosshair';
+                            else this.stage.style.cursor = 'pointer';
+                        }
+                    };
+                }
+            }
+
+            // --- XỬ LÝ TƯƠNG TÁC (CHẠM & KÉO) ---
+            bindInteractions() {
+                // Pointer events hỗ trợ cả Chuột (PC) và Cảm ứng (Mobile)
+                this.stage.addEventListener('pointerdown', (e) => {
+                    this.isPointerDown = true;
+                    this.handleInteraction(e);
+                });
+
+                this.stage.addEventListener('pointermove', (e) => {
+                    if (this.isPointerDown) {
+                        this.handleInteraction(e);
+                    }
+                });
+
+                this.stage.addEventListener('pointerup', () => this.isPointerDown = false);
+                this.stage.addEventListener('pointerleave', () => this.isPointerDown = false);
+            }
+
+            handleInteraction(e) {
+                if (!this.currentMode) return;
+
+                // Lấy tọa độ click/chạm tương đối với pet-stage
+                const rect = this.stage.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const now = Date.now();
+
+                // Logic riêng cho từng chế độ
+                if (this.currentMode === 'feed' && e.type === 'pointerdown') {
+                    // Cho ăn: Chỉ kích hoạt khi click (pointerdown)
+                    this.spawnElement('🐟', x, y, 'food-item');
+                    this.increaseStat('food', 10);
+                } 
+                else if (this.currentMode === 'play' && now - this.lastSpawnTime > 50) {
+                    // Chơi: Thả vệt len khi di chuyển (giới hạn 50ms tạo 1 hạt)
+                    this.spawnElement('🧶', x, y, 'toy-item');
+                    this.increaseStat('fun', 1); // Tăng chậm vì rà liên tục
+                    this.lastSpawnTime = now;
+                } 
+                else if (this.currentMode === 'bathe' && now - this.lastSpawnTime > 50) {
+                    // Tắm: Tạo bọt xà phòng khi chà xát
+                    this.spawnElement('🫧', x + (Math.random()*40-20), y + (Math.random()*40-20), 'bubble-item');
+                    this.increaseStat('clean', 1.5);
+                    this.lastSpawnTime = now;
+                }
+            }
+
+            // Tạo các icon rơi/bay ra
+            spawnElement(emoji, x, y, className) {
+                const el = document.createElement('div');
+                el.className = `interaction-item ${className}`;
+                el.innerText = emoji;
+                el.style.left = `${x}px`;
+                el.style.top = `${y}px`;
+                this.stage.appendChild(el);
+
+                // Tự động xóa khỏi DOM sau khi animation kết thúc (1s)
+                setTimeout(() => { el.remove(); }, 1000);
+            }
+
+            increaseStat(type, amount) {
+                if (this.stats[type] >= 100) return;
+                this.stats[type] = Math.min(100, this.stats[type] + amount);
+                this.updateUI();
+            }
+
+            // Vòng lặp giảm chỉ số theo thời gian
+            startGameLoop() {
+                setInterval(() => {
+                    this.stats.food = Math.max(0, this.stats.food - 1);
+                    this.stats.fun = Math.max(0, this.stats.fun - 0.8);
+                    this.stats.clean = Math.max(0, this.stats.clean - 0.5);
+                    this.updateUI();
+                }, 1500); 
+            }
+
+            updateUI() {
+                for (let key in this.stats) {
+                    let val = this.stats[key];
+                    let bar = this.bars[key];
+                    bar.style.width = val + '%';
+
+                    if (val > 50) bar.style.backgroundColor = this.getDefaultColor(key);
+                    else if (val > 25) bar.style.backgroundColor = '#ffdfba'; 
+                    else bar.style.backgroundColor = '#ff6961'; 
+                }
+            }
+
+            getDefaultColor(type) {
+                if (type === 'food') return '#ffb3ba';
+                if (type === 'fun') return '#baffc9';
+                return '#bae1ff';
+            }
+        }
+
+        const game = new InteractivePetGame();
+    </script>
+</body>
+</html>

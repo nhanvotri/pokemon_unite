@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Stick War Web v3</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: linear-gradient(to top, #6ec6ff, #e3f2fd);
+        font-family: Arial;
+    }
+    #ui {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-weight: bold;
+    }
+    button {
+        padding: 8px;
+        margin-top: 5px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div id="ui">
+    Gold: <span id="gold">300</span><br>
+    <button onclick="spawnSoldier()">Train Soldier (50)</button><br>
+    <button onclick="spawnMiner()">Train Miner (75)</button>
+</div>
+
+<canvas id="game"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let gold = 300;
+
+let soldiers = [];
+let enemies = [];
+let miners = [];
+let enemyMiners = [];
+
+let base = { x: 60, hp: 1000 };
+let enemyBase = { x: canvas.width - 120, hp: 1000 };
+
+let playerMine = { x: canvas.width/2 - 250 };
+let enemyMine = { x: canvas.width/2 + 150 };
+
+document.getElementById("gold").innerText = gold;
+
+class Soldier {
+    constructor(x, team) {
+        this.x = x;
+        this.y = canvas.height - 120;
+        this.hp = 120;
+        this.team = team;
+        this.speed = 1.2;
+        this.damage = 0.6;
+        this.range = 25;
+    }
+
+    update(targets) {
+        let enemy = targets.find(t => Math.abs(t.x - this.x) < this.range);
+
+        if (enemy) {
+            enemy.hp -= this.damage;
+        } else {
+            if (this.team === "player") this.x += this.speed;
+            else this.x -= this.speed;
+        }
+    }
+
+    draw() {
+        ctx.save();
+
+        // Shadow
+        ctx.fillStyle = "rgba(0,0,0,0.2)";
+        ctx.beginPath();
+        ctx.ellipse(this.x, this.y + 45, 15, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = this.team === "player" ? "#0d47a1" : "#b71c1c";
+        ctx.fillStyle = this.team === "player" ? "#2196f3" : "#f44336";
+
+        // Head
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 20, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Body
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - 8);
+        ctx.lineTo(this.x, this.y + 25);
+        ctx.stroke();
+
+        // Arms
+        ctx.beginPath();
+        ctx.moveTo(this.x - 15, this.y);
+        ctx.lineTo(this.x + 15, this.y);
+        ctx.stroke();
+
+        // Legs
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + 25);
+        ctx.lineTo(this.x - 12, this.y + 45);
+        ctx.moveTo(this.x, this.y + 25);
+        ctx.lineTo(this.x + 12, this.y + 45);
+        ctx.stroke();
+
+        // Sword
+        ctx.strokeStyle = "#ccc";
+        ctx.beginPath();
+        ctx.moveTo(this.x + (this.team==="player"?15:-15), this.y - 5);
+        ctx.lineTo(this.x + (this.team==="player"?25:-25), this.y - 20);
+        ctx.stroke();
+
+        // HP bar
+        ctx.fillStyle = "green";
+        ctx.fillRect(this.x - 20, this.y - 45, this.hp / 3, 6);
+
+        ctx.restore();
+    }
+}
+
+class Miner {
+    constructor(team) {
+        this.team = team;
+        this.x = team === "player" ? base.x + 60 : enemyBase.x - 60;
+        this.y = canvas.height - 120;
+        this.state = "toMine";
+        this.speed = 1;
+    }
+
+    update() {
+        let mine = this.team === "player" ? playerMine : enemyMine;
+        let baseX = this.team === "player" ? base.x + 60 : enemyBase.x - 60;
+
+        if (this.state === "toMine") {
+            this.x += this.team === "player" ? this.speed : -this.speed;
+            if (Math.abs(this.x - mine.x) < 5) {
+                this.state = "mining";
+                setTimeout(() => {
+                    if (this.team === "player") {
+                        gold += 40;
+                        document.getElementById("gold").innerText = gold;
+                    }
+                    this.state = "toBase";
+                }, 1000);
+            }
+        } 
+        else if (this.state === "toBase") {
+            this.x += this.team === "player" ? -this.speed : this.speed;
+            if (Math.abs(this.x - baseX) < 5) {
+                this.state = "toMine";
+            }
+        }
+    }
+
+    draw() {
+        ctx.strokeStyle = this.team === "player" ? "#1565c0" : "#c62828";
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 15, 9, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - 6);
+        ctx.lineTo(this.x, this.y + 20);
+        ctx.stroke();
+    }
+}
+
+function spawnSoldier() {
+    if (gold >= 50) {
+        gold -= 50;
+        document.getElementById("gold").innerText = gold;
+        soldiers.push(new Soldier(base.x + 80, "player"));
+    }
+}
+
+function spawnMiner() {
+    if (gold >= 75) {
+        gold -= 75;
+        document.getElementById("gold").innerText = gold;
+        miners.push(new Miner("player"));
+    }
+}
+
+function spawnEnemy() {
+    enemies.push(new Soldier(enemyBase.x - 80, "enemy"));
+    enemyMiners.push(new Miner("enemy"));
+}
+
+setInterval(spawnEnemy, 5000);
+
+function drawMine(mine, team) {
+    ctx.fillStyle = "gold";
+    ctx.fillRect(mine.x - 40, canvas.height - 100, 80, 50);
+
+    ctx.strokeStyle = team === "player" ? "#0d47a1" : "#b71c1c";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(mine.x - 40, canvas.height - 100, 80, 50);
+}
+
+function update() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Ground
+    ctx.fillStyle = "#5d4037";
+    ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+
+    drawMine(playerMine, "player");
+    drawMine(enemyMine, "enemy");
+
+    // Bases
+    ctx.fillStyle = "#1565c0";
+    ctx.fillRect(base.x, canvas.height - 150, 60, 150);
+
+    ctx.fillStyle = "#c62828";
+    ctx.fillRect(enemyBase.x, canvas.height - 150, 60, 150);
+
+    soldiers.forEach((s,i)=>{
+        s.update(enemies);
+        s.draw();
+        if (s.hp <= 0) soldiers.splice(i,1);
+    });
+
+    enemies.forEach((e,i)=>{
+        e.update(soldiers);
+        e.draw();
+        if (e.hp <= 0) enemies.splice(i,1);
+    });
+
+    miners.forEach(m=>{
+        m.update();
+        m.draw();
+    });
+
+    enemyMiners.forEach(m=>{
+        m.update();
+        m.draw();
+    });
+
+    requestAnimationFrame(update);
+}
+
+update();
+</script>
+
+</body>
+</html>
