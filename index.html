@@ -8,7 +8,7 @@
         /* ==========================================================================
            [1] CSS RESET & BỐ CỤC NỀN TẢNG
            ========================================================================== */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
         body { 
             overflow: hidden; 
             background-color: #050505; 
@@ -20,7 +20,7 @@
         
         #gameCanvas, #inGameMapBtn, #inGameMapModal, #ui-top, #bossUiContainer, 
         #upgradePointsDisplay, #hud-bottom, #playerContainer, #dayNightOverlay, 
-        #bloodVignette, #comboUI, #buffsUI { 
+        #bloodVignette, #comboUI, #buffsUI, #mobile-ui { 
             display: none; 
         }
 
@@ -46,7 +46,7 @@
         }
         
         /* ==========================================================================
-           [2] GIAO DIỆN MENU CHÍNH (THIẾT KẾ ĐIỆN ẢNH)
+           [2] GIAO DIỆN MENU CHÍNH
            ========================================================================== */
         #startMenu { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -54,20 +54,19 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; 
         }
         #startMenu h1 { 
-            font-size: 65px; color: #f1c40f; 
+            font-size: 65px; color: #f1c40f; text-align: center;
             text-shadow: 0 15px 40px rgba(241,196,15,0.4), 0 0 15px rgba(255,255,255,0.2); 
             margin-bottom: 5px; text-transform: uppercase; letter-spacing: 8px; font-weight: 900; 
         }
+        @media (max-width: 768px) { #startMenu h1 { font-size: 40px; letter-spacing: 4px;} }
         .subtitle { 
-            font-size: 18px; color: #fff; margin-bottom: 20px; letter-spacing: 4px; 
+            font-size: 18px; color: #fff; margin-bottom: 20px; letter-spacing: 4px; text-align: center;
             background: linear-gradient(90deg, #e74c3c, #8e44ad, #3498db); padding: 8px 25px; 
-            border-radius: 8px; font-weight: bold; box-shadow: 0 0 30px rgba(142, 68, 173, 0.6); 
-            text-transform: uppercase; 
+            border-radius: 8px; font-weight: bold; box-shadow: 0 0 30px rgba(142, 68, 173, 0.6); text-transform: uppercase; 
         }
+        @media (max-width: 768px) { .subtitle { font-size: 12px; letter-spacing: 2px;} }
         
-        #heroDisplayArea { 
-            display: flex; align-items: center; gap: 40px; margin-bottom: 25px; 
-        }
+        #heroDisplayArea { display: flex; align-items: center; gap: 40px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center;}
         #previewContainer { 
             width: 180px; height: 180px; background: rgba(0,0,0,0.8); border-radius: 50%; 
             display: flex; justify-content: center; align-items: center; border: 4px solid #f1c40f; 
@@ -82,8 +81,7 @@
 
         #statsContainer { 
             background: rgba(15, 20, 25, 0.8); padding: 15px 25px; border-radius: 15px; 
-            border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
-            backdrop-filter: blur(10px); min-width: 250px; 
+            border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.8); backdrop-filter: blur(10px); min-width: 250px; 
         }
         .stat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .stat-row:last-child { margin-bottom: 0; }
@@ -92,7 +90,7 @@
         .star-filled { color: #f1c40f; text-shadow: 0 0 8px rgba(241,196,15,0.8); }
         .star-empty { color: #555; }
         
-        #menuHeroes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 900px; margin-bottom: 30px; }
+        #menuHeroes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 900px; margin-bottom: 30px; padding: 0 10px;}
         .menuBtn { 
             background: rgba(44, 62, 80, 0.8); color: white; border: 2px solid #7f8c8d; padding: 10px 20px; 
             border-radius: 10px; font-size: 13px; font-weight: 900; cursor: pointer; 
@@ -149,72 +147,43 @@
             background: rgba(44, 62, 80, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.2); 
             padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; min-width: 150px; 
         }
-        .mapBtn:hover:not(.locked) { background: #e74c3c; border-color: #fff; transform: scale(1.05) translateY(-3px); box-shadow: 0 10px 20px rgba(231,76,60,0.5); }
         .mapBtn.active { background: linear-gradient(45deg, #c0392b, #e74c3c); border-color: #fff; box-shadow: 0 0 15px rgba(231,76,60,0.6); }
         .mapBtn.locked { background: rgba(0,0,0,0.5); color: #555; cursor: not-allowed; border-color: #111; }
         #inGameMapModal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 200; }
         .closeModalBtn { position: absolute; top: 10px; right: 20px; color: #e74c3c; font-size: 30px; cursor: pointer; font-weight: 900; transition: 0.3s; }
-        .closeModalBtn:hover { transform: scale(1.2) rotate(90deg); text-shadow: 0 0 10px #e74c3c;}
 
         #ui-top { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 10; text-align: center; pointer-events: none; width: 100%;}
         #ui-top h1 { margin: 0; font-size: 24px; color: rgba(255,255,255,0.8); text-shadow: 0 3px 10px rgba(0,0,0,1); letter-spacing: 4px; font-weight: 900;}
 
-        /* Combo Counter */
         #comboUI { position: absolute; top: 80px; right: 30px; z-index: 10; text-align: right; pointer-events: none; transform: scale(1); transition: transform 0.1s; }
         #comboText { font-size: 35px; font-weight: 900; color: #f39c12; text-shadow: 0 0 15px #e67e22, 2px 2px 0 #000; font-style: italic;}
         #comboLabel { font-size: 14px; color: #fff; font-weight: bold; letter-spacing: 1px; text-shadow: 1px 1px 0 #000; margin-top: -5px;}
         #comboBarBg { width: 120px; height: 5px; background: rgba(0,0,0,0.5); border: 1px solid #000; float: right; margin-top: 5px; border-radius: 3px; overflow: hidden;}
         #comboBarFill { width: 100%; height: 100%; background: #f1c40f; transition: width 0.1s linear;}
 
-        #buffsUI { position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; pointer-events: none; }
+        #buffsUI { position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 10; pointer-events: none; }
         .buff-icon { width: 35px; height: 35px; border-radius: 50%; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; box-shadow: 0 0 10px rgba(0,0,0,0.8); animation: pulseBuff 0.5s infinite alternate; }
         @keyframes pulseBuff { from { transform: scale(1); } to { transform: scale(1.1); } }
 
-        /* Boss Bar */
-        #bossUiContainer { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 50%; max-width: 500px; text-align: center; z-index: 10; }
+        #bossUiContainer { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); width: 50%; max-width: 500px; text-align: center; z-index: 10; pointer-events: none;}
         #bossName { color: #fd79a8; font-size: 18px; font-weight: 900; text-transform: uppercase; text-shadow: 0 0 10px #d63031, 1px 1px 2px #000; margin-bottom: 5px; letter-spacing: 3px;}
         #bossHpBg { width: 100%; height: 15px; background: rgba(0,0,0,0.8); border: 2px solid #fd79a8; border-radius: 8px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         #bossHpFill { width: 100%; height: 100%; background: linear-gradient(90deg, #d63031, #e84393, #fd79a8); transition: width 0.1s linear; }
 
-        #upgradePointsDisplay { 
-            position: absolute; top: 60px; left: 50%; transform: translateX(-50%); 
-            background: linear-gradient(90deg, rgba(211,84,0,0.9), rgba(243,156,18,0.9)); padding: 6px 20px; border-radius: 20px; 
-            font-weight: 900; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.6); z-index: 20; 
-            border: 2px solid rgba(255,255,255,0.5); animation: pulseBanner 0.8s infinite alternate; letter-spacing: 1px; backdrop-filter: blur(3px); 
-        }
+        #upgradePointsDisplay { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, rgba(211,84,0,0.9), rgba(243,156,18,0.9)); padding: 6px 20px; border-radius: 20px; font-weight: 900; font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.6); z-index: 20; border: 2px solid rgba(255,255,255,0.5); animation: pulseBanner 0.8s infinite alternate; letter-spacing: 1px; backdrop-filter: blur(3px); pointer-events: none;}
         #pts { font-size: 16px; color: #fff; text-shadow: 0 2px 3px #000; margin: 0 3px; vertical-align: middle;}
 
-        /* HUD Thanh Kỹ Năng */
-        #hud-bottom {
-            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; 
-            background: rgba(15, 20, 25, 0.7); padding: 10px 25px 15px 25px; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); z-index: 10; 
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); 
-        }
+        #hud-bottom { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; background: rgba(15, 20, 25, 0.7); padding: 10px 25px 15px 25px; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); z-index: 10; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         #skillBar { display: flex; gap: 15px; }
         .skill-container { display: flex; flex-direction: column; align-items: center; position: relative; }
         .skill-name { font-size: 10px; font-weight: bold; text-shadow: 1px 1px 2px #000; color: #bdc3c7; margin-top: 6px; letter-spacing: 0.5px; text-transform: uppercase;}
-        .skill-slot { 
-            width: 45px; height: 45px; background: rgba(0,0,0,0.5); border-radius: 50%; border: 2px solid #7f8c8d; position: relative; 
-            display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: 900; 
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 3px 6px rgba(0,0,0,0.5); transition: all 0.2s; 
-        }
-        .skill-key { 
-            position: absolute; top: -4px; right: -4px; background: #e74c3c; color: white; font-size: 10px; width: 18px; height: 18px; 
-            display: flex; justify-content: center; align-items: center; border-radius: 50%; border: 1px solid #fff; font-weight: 900; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.8); 
-        }
-        .cooldown-overlay { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; font-size: 16px; color: #fff; opacity: 0; font-weight: 900; text-shadow: 0 0 4px #000; 
-        }
-        .skill-lvl-badge { 
-            position: absolute; bottom: -6px; background: #2c3e50; color: #f1c40f; font-size: 9px; padding: 2px 6px; border-radius: 8px; border: 1px solid #f1c40f; font-weight: 900; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.8); 
-        }
-        .upgrade-btn { 
-            position: absolute; top: -30px; width: 24px; height: 24px; background: linear-gradient(135deg, #f1c40f, #e67e22); color: #000; border: 2px solid #fff; border-radius: 50%; font-size: 16px; font-weight: 900; cursor: pointer; display: none; justify-content: center; align-items: center; z-index: 15; animation: bounceUpg 0.6s infinite alternate; box-shadow: 0 3px 8px rgba(0,0,0,0.5); 
-        }
-        .upgrade-btn:hover { background: #fff; color: #e74c3c; border-color: #e74c3c; transform: scale(1.2); }
-
-        #xpBarContainer { width: 100%; min-width: 280px; height: 14px; background: rgba(0, 0, 0, 0.6); border-radius: 7px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 8px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; }
+        .skill-slot { width: 45px; height: 45px; background: rgba(0,0,0,0.5); border-radius: 50%; border: 2px solid #7f8c8d; position: relative; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: 900; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 3px 6px rgba(0,0,0,0.5); cursor: pointer; pointer-events: auto;}
+        .skill-key { position: absolute; top: -4px; right: -4px; background: #e74c3c; color: white; font-size: 10px; width: 18px; height: 18px; display: flex; justify-content: center; align-items: center; border-radius: 50%; border: 1px solid #fff; font-weight: 900; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none;}
+        .cooldown-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 16px; color: #fff; opacity: 0; font-weight: 900; text-shadow: 0 0 4px #000; pointer-events: none;}
+        .skill-lvl-badge { position: absolute; bottom: -6px; background: #2c3e50; color: #f1c40f; font-size: 9px; padding: 2px 6px; border-radius: 8px; border: 1px solid #f1c40f; font-weight: 900; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none;}
+        .upgrade-btn { position: absolute; top: -30px; width: 24px; height: 24px; background: linear-gradient(135deg, #f1c40f, #e67e22); color: #000; border: 2px solid #fff; border-radius: 50%; font-size: 16px; font-weight: 900; cursor: pointer; display: none; justify-content: center; align-items: center; z-index: 15; animation: bounceUpg 0.6s infinite alternate; box-shadow: 0 3px 8px rgba(0,0,0,0.5); pointer-events: auto;}
+        
+        #xpBarContainer { width: 100%; min-width: 280px; height: 14px; background: rgba(0, 0, 0, 0.6); border-radius: 7px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 0 8px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; pointer-events: none;}
         #xpBarFill { height: 100%; width: 0%; background: linear-gradient(90deg, #e67e22, #f1c40f); transition: width 0.3s ease-out; position: absolute; left: 0; top: 0; box-shadow: 0 0 8px rgba(241,196,15,0.5);}
         #levelText { position: relative; z-index: 2; font-weight: 900; font-size: 11px; color: white; text-shadow: 0 0 3px #000, 1px 1px 2px #000; letter-spacing: 2px; }
         
@@ -231,12 +200,37 @@
         .mob-hp-bg { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); border-radius: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .mob-hp-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #c0392b); border-radius: 1px; transition: width 0.1s; }
         .mob-lvl { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(44,62,80,0.9); color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: bold; border: 1px solid #f1c40f; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+
+        /* ==========================================================================
+           [4] MOBILE CONTROLS UI
+           ========================================================================== */
+        #mobile-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
+        #joystick-zone { position: absolute; bottom: 0; left: 0; width: 50%; height: 50%; pointer-events: auto; }
+        #joystick-base { 
+            position: absolute; bottom: 40px; left: 40px; width: 130px; height: 130px; 
+            background: rgba(255,255,255,0.15); border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); 
+            display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px);
+            transition: opacity 0.2s; opacity: 0.7; pointer-events: none;
+        }
+        #joystick-stick { 
+            width: 60px; height: 60px; background: rgba(255,255,255,0.8); border-radius: 50%; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.5); pointer-events: none; transform: translate(0px, 0px);
+        }
+        #mobile-attack-btn { 
+            position: absolute; bottom: 40px; right: 40px; width: 100px; height: 100px; 
+            background: radial-gradient(circle, rgba(231, 76, 60, 0.9), rgba(192, 57, 43, 0.9)); 
+            border: 4px solid rgba(255,255,255,0.8); border-radius: 50%; pointer-events: auto; 
+            display: flex; justify-content: center; align-items: center; 
+            font-weight: 900; font-size: 20px; color: #fff; box-shadow: 0 0 25px rgba(231, 76, 60, 0.6); 
+            text-shadow: 1px 1px 3px #000; transition: transform 0.1s; letter-spacing: 1px;
+        }
+        #mobile-attack-btn:active { transform: scale(0.9); background: radial-gradient(circle, #fff, rgba(231, 76, 60, 0.9)); color: #c0392b; }
     </style>
 </head>
 <body>
     <div id="startMenu">
         <h1>POKÉMON UNITE</h1>
-        <div class="subtitle">AWAKENED ENGINE V8 (SIRFETCH'D & OFFLINE)</div>
+        <div class="subtitle">AWAKENED ENGINE V8 (MOBILE TOUCH SUPPORT)</div>
         
         <div id="heroDisplayArea">
             <div id="previewContainer">
@@ -272,6 +266,12 @@
     <div id="dayNightOverlay"></div>
     <div id="bloodVignette"></div>
 
+    <div id="mobile-ui">
+        <div id="joystick-zone"></div>
+        <div id="joystick-base"><div id="joystick-stick"></div></div>
+        <div id="mobile-attack-btn">ĐÁNH</div>
+    </div>
+
     <button id="inGameMapBtn" onclick="openMapModal()">🗺️ BẢN ĐỒ</button>
     <div id="inGameMapModal" class="mapSelectionContainer">
         <span class="closeModalBtn" onclick="closeMapModal()">X</span>
@@ -288,10 +288,10 @@
 
     <div id="hud-bottom">
         <div id="skillBar">
-            <div class="skill-container"><div class="skill-slot" id="skill-Z" style="border-color: #2ecc71;"><span class="skill-key">Z</span><div class="cooldown-overlay" id="cd-Z"></div></div><div class="skill-name" id="name-Z">Tốc Biến</div></div>
-            <div class="skill-container"><div class="upgrade-btn" id="upg-Q" onclick="upgradeSkill('q')">+</div><div class="skill-slot" id="skill-Q"><span class="skill-key">Q</span><div class="cooldown-overlay" id="cd-Q"></div><div class="skill-lvl-badge" id="lv-Q">Lv.1</div></div><div class="skill-name" id="name-Q">Skill 1</div></div>
-            <div class="skill-container"><div class="upgrade-btn" id="upg-E" onclick="upgradeSkill('e')">+</div><div class="skill-slot" id="skill-E"><span class="skill-key">E</span><div class="cooldown-overlay" id="cd-E"></div><div class="skill-lvl-badge" id="lv-E">Lv.1</div></div><div class="skill-name" id="name-E">Skill 2</div></div>
-            <div class="skill-container"><div class="upgrade-btn" id="upg-R" onclick="upgradeSkill('r')">+</div><div class="skill-slot" id="skill-R" style="border-color: #f1c40f;"><span class="skill-key">R</span><div class="cooldown-overlay" id="cd-R"></div><div class="skill-lvl-badge" id="lv-R">Lv.1</div></div><div class="skill-name" id="name-R" style="color: #f1c40f;">Chiêu Cuối</div></div>
+            <div class="skill-container"><div class="skill-slot" id="skill-Z" style="border-color: #2ecc71;" onmousedown="handleSkillClick('z')" ontouchstart="handleSkillTouch(event, 'z')"><span class="skill-key">Z</span><div class="cooldown-overlay" id="cd-Z"></div></div><div class="skill-name" id="name-Z">Tốc Biến</div></div>
+            <div class="skill-container"><div class="upgrade-btn" id="upg-Q" onclick="upgradeSkill('q')">+</div><div class="skill-slot" id="skill-Q" onmousedown="handleSkillClick('q')" ontouchstart="handleSkillTouch(event, 'q')"><span class="skill-key">Q</span><div class="cooldown-overlay" id="cd-Q"></div><div class="skill-lvl-badge" id="lv-Q">Lv.1</div></div><div class="skill-name" id="name-Q">Skill 1</div></div>
+            <div class="skill-container"><div class="upgrade-btn" id="upg-E" onclick="upgradeSkill('e')">+</div><div class="skill-slot" id="skill-E" onmousedown="handleSkillClick('e')" ontouchstart="handleSkillTouch(event, 'e')"><span class="skill-key">E</span><div class="cooldown-overlay" id="cd-E"></div><div class="skill-lvl-badge" id="lv-E">Lv.1</div></div><div class="skill-name" id="name-E">Skill 2</div></div>
+            <div class="skill-container"><div class="upgrade-btn" id="upg-R" onclick="upgradeSkill('r')">+</div><div class="skill-slot" id="skill-R" style="border-color: #f1c40f;" onmousedown="handleSkillClick('r')" ontouchstart="handleSkillTouch(event, 'r')"><span class="skill-key">R</span><div class="cooldown-overlay" id="cd-R"></div><div class="skill-lvl-badge" id="lv-R">Lv.1</div></div><div class="skill-name" id="name-R" style="color: #f1c40f;">Chiêu Cuối</div></div>
         </div>
         <div id="xpBarContainer"><div id="xpBarFill"></div><div id="levelText">LV. 1</div></div>
     </div>
@@ -317,7 +317,7 @@
         let isPlaying = false; let animationId = null; let lastTime = 0; let lastBasicAttackTime = 0;
         let screenShakeTime = 0; let screenShakeMagnitude = 0; let highestLevelReached = 1; let selectedMapId = 1;
         let timeOfDay = 0; const DAY_LENGTH = 3600; let comboCount = 0; let comboTimer = 0; const MAX_COMBO_TIMER = 180;
-        let isHeartbeatPlaying = false;
+        let isHeartbeatPlaying = false; let isMobile = false;
 
         // AUDIO
         const audioSystem = {
@@ -447,6 +447,12 @@
 
             document.getElementById('startMenu').style.display = 'none'; document.getElementById('gameCanvas').style.display = 'block'; document.getElementById('ui-top').style.display = 'block'; document.getElementById('hud-bottom').style.display = 'flex'; document.getElementById('playerContainer').style.display = 'block'; document.getElementById('dayNightOverlay').style.display = 'block'; document.getElementById('bloodVignette').style.display = 'block'; document.getElementById('bossUiContainer').style.display = 'none'; document.getElementById('upgradePointsDisplay').style.display = 'none'; document.getElementById('inGameMapModal').style.display = 'none'; buffsUI.style.display = 'flex';
 
+            // Kích hoạt Mobile UI nếu thiết bị có cảm ứng (hoặc màn hình nhỏ)
+            if (isMobile) {
+                document.getElementById('mobile-ui').style.display = 'block';
+                document.getElementById('hud-bottom').style.bottom = '160px'; // Nâng thanh kỹ năng lên để không bị che bởi nút đánh
+            }
+
             const def = pokemonDefs[player.currentPokemon];
             spriteEl.src = def.gif; spriteEl.style.width = def.spriteWidth + 'px';
             document.getElementById('playerNameTag').innerText = def.name; document.getElementById('playerNameTag').style.color = def.glowColor; document.getElementById('gameTitle').style.color = def.glowColor;
@@ -457,6 +463,7 @@
             document.getElementById('xpBarFill').style.width = '0%'; document.getElementById('levelText').innerText = `LV. 1`; document.getElementById('playerHpFill').style.width = '100%'; 
             
             player.isCasting = false; player.attackFrames = 0; player.dashTime = 0; player.isMoving = false; player.animRot = 0; player.animOffsetY = 0; player.animSqueezeX = 1; player.animSqueezeY = 1; player.walkFrame = 0;
+            player.dashAngle = 0; // Reset góc nhìn mặc định
             Object.keys(cooldowns).forEach(k => cooldowns[k] = 0); for (let k in keys) keys[k] = false; 
             
             highestLevelReached = 1; timeOfDay = 0; clearGameWorld(); updateUpgradeUI(); resizeCanvas(); switchMapMidGame(1);
@@ -545,7 +552,7 @@
         function handleDeath() {
             isPlaying = false; if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
             audioSystem.stopBGM(); audioSystem.handleHeartbeat(false); clearGameWorld();
-            document.getElementById('gameCanvas').style.display = 'none'; document.getElementById('ui-top').style.display = 'none'; document.getElementById('bossUiContainer').style.display = 'none'; document.getElementById('upgradePointsDisplay').style.display = 'none'; document.getElementById('hud-bottom').style.display = 'none'; document.getElementById('playerContainer').style.display = 'none'; document.getElementById('inGameMapBtn').style.display = 'none'; document.getElementById('inGameMapModal').style.display = 'none'; document.getElementById('dayNightOverlay').style.display = 'none'; document.getElementById('bloodVignette').style.display = 'none'; comboUI.style.display = 'none'; buffsUI.style.display = 'none';
+            document.getElementById('gameCanvas').style.display = 'none'; document.getElementById('ui-top').style.display = 'none'; document.getElementById('bossUiContainer').style.display = 'none'; document.getElementById('upgradePointsDisplay').style.display = 'none'; document.getElementById('hud-bottom').style.display = 'none'; document.getElementById('playerContainer').style.display = 'none'; document.getElementById('inGameMapBtn').style.display = 'none'; document.getElementById('inGameMapModal').style.display = 'none'; document.getElementById('dayNightOverlay').style.display = 'none'; document.getElementById('bloodVignette').style.display = 'none'; comboUI.style.display = 'none'; buffsUI.style.display = 'none'; document.getElementById('mobile-ui').style.display = 'none';
             document.getElementById('startMenu').style.display = 'flex';
         }
 
@@ -566,12 +573,108 @@
         // ==========================================
         window.addEventListener('keydown', (e) => { if(!isPlaying || document.getElementById('inGameMapModal').style.display === 'block') return; keys[e.key.toLowerCase()] = true; if (['z', 'q', 'e', 'r'].includes(e.key.toLowerCase())) { useSkill(e.key.toLowerCase()); } });
         window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
-        window.addEventListener('mousemove', (e) => { if(!isPlaying || document.getElementById('inGameMapModal').style.display === 'block') return; mouseX = e.clientX; mouseY = e.clientY; if (player.dashTime <= 0) { player.facingRight = mouseX + camera.x > player.x; } });
+        window.addEventListener('mousemove', (e) => { if(!isPlaying || isMobile || document.getElementById('inGameMapModal').style.display === 'block') return; mouseX = e.clientX; mouseY = e.clientY; if (player.dashTime <= 0) { player.facingRight = mouseX + camera.x > player.x; } });
         
         window.addEventListener('mousedown', (e) => {
-            if (!isPlaying || player.dashTime > 0) return;
+            if (isMobile || !isPlaying || player.dashTime > 0) return; // Nếu dùng mobile thì chặn mousedown chuột trái
             if (e.target.classList.contains('upgrade-btn') || e.target.id === 'inGameMapBtn' || document.getElementById('inGameMapModal').style.display === 'block') return;
+            executeAttack();
+        });
+
+        // ==========================================
+        // ĐIỀU KHIỂN MOBILE (JOYSTICK & AUTO AIM)
+        // ==========================================
+        window.addEventListener('touchstart', function enableMobile(e) {
+            if(!isMobile) {
+                isMobile = true;
+                if(isPlaying) {
+                    document.getElementById('mobile-ui').style.display = 'block';
+                    document.getElementById('hud-bottom').style.bottom = '160px'; 
+                }
+            }
+        });
+
+        let joyX = 0, joyY = 0;
+        let joyCenter = null;
+        let activeTouchId = null;
+        const joyBase = document.getElementById('joystick-base');
+        const joyStick = document.getElementById('joystick-stick');
+        const joyZone = document.getElementById('joystick-zone');
+
+        joyZone.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if(activeTouchId !== null) return;
+            const touch = e.changedTouches[0];
+            activeTouchId = touch.identifier;
             
+            // Hiện joyBase tại nơi chạm
+            joyBase.style.left = (touch.clientX - 65) + 'px';
+            joyBase.style.top = (touch.clientY - 65) + 'px';
+            joyBase.style.bottom = 'auto'; // Xóa css bottom
+            joyBase.style.opacity = 1;
+            
+            joyCenter = { x: touch.clientX, y: touch.clientY };
+            joyX = 0; joyY = 0;
+            joyStick.style.transform = `translate(0px, 0px)`;
+        }, {passive: false});
+
+        joyZone.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if(activeTouchId === null) return;
+            for(let i=0; i<e.changedTouches.length; i++) {
+                if(e.changedTouches[i].identifier === activeTouchId) {
+                    const touch = e.changedTouches[i];
+                    let dx = touch.clientX - joyCenter.x;
+                    let dy = touch.clientY - joyCenter.y;
+                    const maxDist = 45;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
+                    joyStick.style.transform = `translate(${dx}px, ${dy}px)`;
+                    joyX = dx / maxDist; joyY = dy / maxDist;
+                    break;
+                }
+            }
+        }, {passive: false});
+
+        function resetJoystick() {
+            activeTouchId = null; joyX = 0; joyY = 0;
+            joyStick.style.transform = `translate(0px, 0px)`;
+            joyBase.style.opacity = 0.5;
+            // Reset vị trí joyBase về góc dưới trái
+            joyBase.style.left = '40px'; joyBase.style.bottom = '40px'; joyBase.style.top = 'auto';
+        }
+
+        joyZone.addEventListener('touchend', (e) => { e.preventDefault(); resetJoystick(); });
+        joyZone.addEventListener('touchcancel', (e) => { e.preventDefault(); resetJoystick(); });
+
+        document.getElementById('mobile-attack-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            executeAttack(true); // True = là mobile
+        });
+
+        function handleSkillTouch(e, key) {
+            e.preventDefault();
+            useSkill(key, true);
+        }
+        function handleSkillClick(key) {
+            if(!isMobile) useSkill(key, false);
+        }
+
+        // Tự động tìm góc bắn vào quái gần nhất
+        function getAutoAimAngle() {
+            let nearestMob = null;
+            let minDist = 800; // Phạm vi auto aim
+            for (let mob of mobs) {
+                if (mob.isDead) continue;
+                let d = Math.hypot(player.x - mob.x, player.y - mob.y);
+                if (d < minDist) { minDist = d; nearestMob = mob; }
+            }
+            if (nearestMob) return Math.atan2(nearestMob.y - player.y, nearestMob.x - player.x);
+            return player.dashAngle; // Bắn theo hướng di chuyển cuối cùng nếu không có quái
+        }
+
+        function executeAttack(fromMobile = false) {
+            if (!isPlaying || player.dashTime > 0) return;
             const now = Date.now(); if (now - lastBasicAttackTime < 250) return; lastBasicAttackTime = now; 
             audioSystem.playSFX('attack');
 
@@ -581,7 +684,15 @@
 
             let isCrit = Math.random() < 0.2; if(isCrit) { basicDmg *= 2; audioSystem.playSFX('crit'); }
 
-            const targetXMouse = mouseX + camera.x; const targetYMouse = mouseY + camera.y; const angle = Math.atan2(targetYMouse - player.y, targetXMouse - player.x);
+            let angle;
+            if(fromMobile) {
+                angle = getAutoAimAngle();
+                player.facingRight = Math.cos(angle) > 0;
+            } else {
+                const targetXMouse = mouseX + camera.x; const targetYMouse = mouseY + camera.y; 
+                angle = Math.atan2(targetYMouse - player.y, targetXMouse - player.x);
+            }
+
             const reach = 100; const attackX = player.x + Math.cos(angle) * reach; const attackY = player.y + Math.sin(angle) * reach;
 
             let effectType = 'basic_cut';
@@ -599,16 +710,22 @@
 
             visualEffects.push({ x: attackX, y: attackY, angle: angle, type: effectType, life: 15, isRed: player.buffs.damage > 0 });
             dealAoEDamage(attackX, attackY, 130, basicDmg, isCrit); playBasicAttackAnimation();
-        });
+        }
 
         function playBasicAttackAnimation() { player.attackFrames = 12; containerEl.style.filter = `drop-shadow(0px 0px 30px ${pokemonDefs[player.currentPokemon].glowColor}) brightness(1.5)`; setTimeout(() => { containerEl.style.filter = ''; }, 150); }
         function playSkillAnimation() { player.attackFrames = 25; containerEl.style.filter = `drop-shadow(0px 0px 50px ${pokemonDefs[player.currentPokemon].glowColor}) brightness(2)`; setTimeout(() => { containerEl.style.filter = ''; }, 300); }
 
-        function useSkill(key) {
+        function useSkill(key, fromMobile = false) {
             if (cooldowns[key] > 0 || player.dashTime > 0) return;
-            const targetX = mouseX + camera.x; const targetY = mouseY + camera.y; 
             
-            const angle = Math.atan2(targetY - player.y, targetX - player.x);
+            let angle;
+            if(fromMobile) {
+                angle = getAutoAimAngle();
+                player.facingRight = Math.cos(angle) > 0;
+            } else {
+                const targetX = mouseX + camera.x; const targetY = mouseY + camera.y; 
+                angle = Math.atan2(targetY - player.y, targetX - player.x);
+            }
 
             if (key === 'z') { 
                 audioSystem.playSFX('dash');
@@ -632,6 +749,10 @@
             let lvDmg = (player.level - 1) * 80; let dmgMultiplier = 1 + (0.25 * (skillLv - 1));
             if(player.buffs.damage > 0) dmgMultiplier *= 2;
             
+            // Xử lý tọa độ đích (nếu dùng chuột, còn mobile thì ngắm theo angle nên ko cần tọa độ chính xác)
+            const targetX = player.x + Math.cos(angle)*300; 
+            const targetY = player.y + Math.sin(angle)*300;
+
             if (player.currentPokemon === 'pikachu') {
                 if (key === 'q') fireProjectile(1, 18, 30, 'electric', Math.round((300 + lvDmg) * dmgMultiplier), 0, false, angle); 
                 if (key === 'e') startDash(angle, 45, 12, Math.round((250 + lvDmg) * dmgMultiplier)); 
@@ -748,13 +869,13 @@
 
         function fireProjectile(count, speed, size, type, damage, spreadAngle = 0, isEnemy = false, fixedAngle = null) {
             let angleBase = fixedAngle !== null ? fixedAngle : Math.atan2(mouseY + camera.y - player.y, mouseX + camera.x - player.x);
+            if(isMobile && fixedAngle === null && !isEnemy) angleBase = getAutoAimAngle(); // Thêm hỗ trợ bắn đạn cho Mobile auto-aim
+            
             let originX = isEnemy ? mewtwoBoss.x : player.x; let originY = isEnemy ? mewtwoBoss.y : player.y;
             for (let i = 0; i < count; i++) {
                 let a = angleBase; if (count > 1) { a += (i - (count - 1) / 2) * spreadAngle; }
                 let isPierceR = !isEnemy && (type === 'shuriken' || type === 'fire' || type === 'aura_sphere' || type === 'shadow_ball' || type === 'frost' || type === 'energy_ball' || type === 'leaf' || type === 'solar_beam') && size >= 40;
-                
                 let lifeSpan = isPierceR ? 40 : undefined;
-
                 projectiles.push({ x: originX, y: originY, type: type, radius: size, dmg: damage, rotation: a, vx: Math.cos(a)*speed, vy: Math.sin(a)*speed, life: lifeSpan, piercedMobs: isPierceR ? [] : undefined, isEnemy: isEnemy });
             }
         }
@@ -884,8 +1005,19 @@
                     if (player.dashDamage > 0) { dealAoEDamage(player.x, player.y, player.radius + 50, player.dashDamage / 5, false); }
                     footstepDust.push({ x: player.x, y: player.y + 10, life: 10, size: 20 });
                 } else if (!player.isCasting) { 
-                    let dx = 0, dy = 0; if (keys['w']) dy -= 1; if (keys['s']) dy += 1; if (keys['a']) dx -= 1; if (keys['d']) dx += 1;
-                    if (dx !== 0 || dy !== 0) { player.isMoving = true; const length = Math.hypot(dx, dy); player.x += (dx / length) * speed; player.y += (dy / length) * speed; if (Math.random() < 0.3) { footstepDust.push({ x: player.x, y: player.y + 20, life: 15, size: 10 }); } }
+                    let dx = 0, dy = 0; 
+                    if (keys['w']) dy -= 1; if (keys['s']) dy += 1; if (keys['a']) dx -= 1; if (keys['d']) dx += 1;
+                    if (joyX !== 0 || joyY !== 0) { dx = joyX; dy = joyY; } // Ghi đè bằng Joystick nếu có
+                    
+                    if (dx !== 0 || dy !== 0) { 
+                        player.isMoving = true; 
+                        const length = Math.hypot(dx, dy); 
+                        player.x += (dx / length) * speed; 
+                        player.y += (dy / length) * speed; 
+                        player.dashAngle = Math.atan2(dy, dx); // Cập nhật hướng di chuyển cuối cùng để auto-aim
+                        if (Math.random() < 0.3) { footstepDust.push({ x: player.x, y: player.y + 20, life: 15, size: 10 }); } 
+                        if (player.dashTime <= 0 && isMobile) player.facingRight = dx > 0; // Đổi mặt trên mobile
+                    }
                     if(player.buffs.speed > 0 && Math.random() < 0.5) visualEffects.push({ x: player.x, y: player.y, type: 'trail', life: 10 });
                 }
             }
@@ -1035,7 +1167,7 @@
 
                 ctx.beginPath(); ctx.ellipse(player.x, player.y + player.radius, player.radius*1.2, player.radius*0.6, 0, 0, Math.PI*2); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
                 
-                // Vẽ Khiên Bất Tử 3s siêu xịn
+                // Vẽ Khiên Bất Tử 3s
                 if(player.buffs.shield > 0) {
                     ctx.save(); 
                     ctx.translate(player.x, player.y); 
