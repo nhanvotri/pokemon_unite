@@ -92,7 +92,7 @@
         .star-filled { color: #f1c40f; text-shadow: 0 0 8px rgba(241,196,15,0.8); }
         .star-empty { color: #555; }
         
-        #menuHeroes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 800px; margin-bottom: 30px; }
+        #menuHeroes { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 900px; margin-bottom: 30px; }
         .menuBtn { 
             background: rgba(44, 62, 80, 0.8); color: white; border: 2px solid #7f8c8d; padding: 10px 20px; 
             border-radius: 10px; font-size: 13px; font-weight: 900; cursor: pointer; 
@@ -113,6 +113,7 @@
         #menuBtnSceptile.active { background: linear-gradient(135deg, #27ae60, #2ecc71); box-shadow: 0 5px 20px rgba(46, 204, 113, 0.5);}
         #menuBtnBlaziken.active { background: linear-gradient(135deg, #c0392b, #e74c3c); box-shadow: 0 5px 20px rgba(231, 76, 60, 0.5);}
         #menuBtnSolgaleo.active { background: linear-gradient(135deg, #e67e22, #f1c40f); box-shadow: 0 5px 20px rgba(241, 196, 15, 0.6);}
+        #menuBtnSirfetchd.active { background: linear-gradient(135deg, #f1c40f, #27ae60); color: #000; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.6);}
 
         #btnStartGame { 
             padding: 15px 60px; font-size: 24px; font-weight: 900; color: #fff; 
@@ -235,7 +236,7 @@
 <body>
     <div id="startMenu">
         <h1>POKÉMON UNITE</h1>
-        <div class="subtitle">AWAKENED ENGINE V8 (LOCAL EDITION)</div>
+        <div class="subtitle">AWAKENED ENGINE V8 (SIRFETCH'D & OFFLINE)</div>
         
         <div id="heroDisplayArea">
             <div id="previewContainer">
@@ -261,6 +262,7 @@
             <button id="menuBtnSceptile" class="menuBtn" onclick="previewHero('sceptile')">Sceptile</button>
             <button id="menuBtnBlaziken" class="menuBtn" onclick="previewHero('blaziken')">Blaziken</button>
             <button id="menuBtnSolgaleo" class="menuBtn" onclick="previewHero('solgaleo')">Solgaleo</button>
+            <button id="menuBtnSirfetchd" class="menuBtn" onclick="previewHero('sirfetchd')">Sirfetch'd</button>
         </div>
         
         <button id="btnStartGame" onclick="startGame()">BẮT ĐẦU HÀNH TRÌNH</button>
@@ -352,7 +354,7 @@
         function closeMapModal() { document.getElementById('inGameMapModal').style.display = 'none'; }
 
         // ==========================================
-        // DỮ LIỆU TƯỚNG (ĐÃ UPDATE HP PIKACHU, SPEED SCEPTILE)
+        // DỮ LIỆU TƯỚNG
         // ==========================================
         const pokemonDefs = {
             pikachu: { name: "PIKACHU", speed: 6.5, glowColor: '#f1c40f', gif: 'https://play.pokemonshowdown.com/sprites/xyani/pikachu.gif', spriteWidth: 45, skills: { q: { name: "Electro Ball", cd: 3000 }, e: { name: "Volt Tackle", cd: 500 }, r: { name: "Thunderbolt", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 } },
@@ -365,7 +367,8 @@
             aurorus: { name: "AURORUS", speed: 5.2, glowColor: '#74b9ff', gif: 'https://play.pokemonshowdown.com/sprites/xyani/aurorus.gif', spriteWidth: 80, skills: { q: { name: "Rock Throw", cd: 4000 }, e: { name: "Frost Breath", cd: 5000 }, r: { name: "Meteor Beam", cd: 18000 } }, stats: { speed: 2, hp: 5, dmg: 5 } },
             sceptile: { name: "SCEPTILE", speed: 12.5, glowColor: '#2ecc71', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sceptile.gif', spriteWidth: 60, skills: { q: { name: "Energy Ball", cd: 3500 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Leaf Storm", cd: 14000 } }, stats: { speed: 5, hp: 3, dmg: 4 } },
             blaziken: { name: "BLAZIKEN", speed: 6.5, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/blaziken.gif', spriteWidth: 55, skills: { q: { name: "Flare Blitz", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Blaze Kick", cd: 13000 } }, stats: { speed: 4, hp: 3, dmg: 5 } },
-            solgaleo: { name: "SOLGALEO", speed: 6.0, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/solgaleo.gif', spriteWidth: 100, skills: { q: { name: "Solar Beam", cd: 5000 }, e: { name: "Psychic Fangs", cd: 600 }, r: { name: "Sunsteel Strike", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 } }
+            solgaleo: { name: "SOLGALEO", speed: 6.0, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/solgaleo.gif', spriteWidth: 100, skills: { q: { name: "Solar Beam", cd: 5000 }, e: { name: "Psychic Fangs", cd: 600 }, r: { name: "Sunsteel Strike", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 } },
+            sirfetchd: { name: "SIRFETCH'D", speed: 6.2, glowColor: '#27ae60', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sirfetchd.gif', spriteWidth: 60, skills: { q: { name: "Close Combat", cd: 4000 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Meteor Assault", cd: 15000 } }, stats: { speed: 3, hp: 4, dmg: 5 } }
         };
 
         const player = { x: 0, y: 0, currentPokemon: 'pikachu', radius: 22, facingRight: false, isCasting: false, attackFrames: 0, isMoving: false, walkFrame: 0, dashTime: 0, dashAngle: 0, dashSpeed: 0, dashDamage: 0, level: 1, xp: 0, maxXp: 100, maxHp: 1000, hp: 1000, upgradePoints: 0, skillLevels: { q: 1, e: 1, r: 1 }, animRot: 0, animOffsetY: 0, animSqueezeX: 1, animSqueezeY: 1, buffs: { damage: 0, speed: 0, shield: 0 } };
@@ -387,7 +390,7 @@
             renderStars('stat-hp', pokemonDefs[heroName].stats.hp);
             renderStars('stat-dmg', pokemonDefs[heroName].stats.dmg);
         }
-        window.onload = () => { previewHero('sceptile'); } 
+        window.onload = () => { previewHero('sirfetchd'); } 
 
         const mobTypes = [
             { name: "Caterpie", baseHp: 400, speed: 2.0, baseDmg: 20, baseXp: 20, gif: 'https://play.pokemonshowdown.com/sprites/xyani/caterpie.gif', size: 35, aggroRange: 375 }, { name: "Oddish", baseHp: 500, speed: 1.8, baseDmg: 25, baseXp: 25, gif: 'https://play.pokemonshowdown.com/sprites/xyani/oddish.gif', size: 35, aggroRange: 375 }, { name: "Aipom", baseHp: 600, speed: 3.5, baseDmg: 35, baseXp: 35, gif: 'https://play.pokemonshowdown.com/sprites/xyani/aipom.gif', size: 40, aggroRange: 600 }, { name: "Bulbasaur", baseHp: 800, speed: 2.0, baseDmg: 40, baseXp: 40, gif: 'https://play.pokemonshowdown.com/sprites/xyani/bulbasaur.gif', size: 45, aggroRange: 450 }, { name: "Audino", baseHp: 1000, speed: 1.5, baseDmg: 30, baseXp: 60, gif: 'https://play.pokemonshowdown.com/sprites/xyani/audino.gif', size: 40, aggroRange: 375 },
@@ -592,6 +595,7 @@
             else if (player.currentPokemon === 'sceptile') effectType = 'leaf_blade_basic';
             else if (player.currentPokemon === 'blaziken') effectType = 'fire_kick';
             else if (player.currentPokemon === 'solgaleo') effectType = 'sun_slash';
+            else if (player.currentPokemon === 'sirfetchd') effectType = 'leaf_blade_basic';
 
             visualEffects.push({ x: attackX, y: attackY, angle: angle, type: effectType, life: 15, isRed: player.buffs.damage > 0 });
             dealAoEDamage(attackX, attackY, 130, basicDmg, isCrit); playBasicAttackAnimation();
@@ -608,14 +612,14 @@
 
             if (key === 'z') { 
                 audioSystem.playSFX('dash');
-                cooldowns['z'] = (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken'].includes(player.currentPokemon)) ? 500 : 1000; 
+                cooldowns['z'] = (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd'].includes(player.currentPokemon)) ? 500 : 1000; 
                 startDash(angle, 50, 8, 0); visualEffects.push({ x: player.x, y: player.y, type: 'explosion', life: 12 }); return; 
             }
 
             const def = pokemonDefs[player.currentPokemon]; let skillLv = player.skillLevels[key]; let cdReduction = 1 - (0.1 * (skillLv - 1)); if (cdReduction < 0.2) cdReduction = 0.2; 
             
             if (key === 'e') {
-                if (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo'].includes(player.currentPokemon)) {
+                if (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd'].includes(player.currentPokemon)) {
                     cooldowns[key] = 500; 
                 } else {
                     cooldowns[key] = Math.round(5000 * cdReduction); 
@@ -719,6 +723,26 @@
                         dealAoEDamage(player.x, player.y, 350, Math.round((2500 + lvDmg * 5) * dmgMultiplier), false);
                     }, 300);
                 }
+            } else if (player.currentPokemon === 'sirfetchd') {
+                if (key === 'q') {
+                    visualEffects.push({ x: player.x + Math.cos(angle)*40, y: player.y + Math.sin(angle)*40, angle: angle, type: 'close_combat', life: 25 });
+                    dealAoEDamage(player.x + Math.cos(angle)*50, player.y + Math.sin(angle)*50, 150, Math.round((500 + lvDmg * 1.5) * dmgMultiplier), false);
+                }
+                if (key === 'e') {
+                    startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
+                    setTimeout(() => {
+                        visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'leaf_blade', life: 25 });
+                        dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
+                    }, 150);
+                }
+                if (key === 'r') {
+                    triggerScreenShake(35, 25);
+                    startDash(angle, 60, 12, Math.round((1000 + lvDmg * 3) * dmgMultiplier));
+                    setTimeout(() => {
+                        visualEffects.push({ x: player.x, y: player.y, type: 'meteor_assault', life: 35 });
+                        dealAoEDamage(player.x, player.y, 250, Math.round((2500 + lvDmg * 5) * dmgMultiplier), false);
+                    }, 200);
+                }
             }
         }
 
@@ -767,7 +791,7 @@
 
         function takePlayerDamage(amount) {
             if (!isPlaying || player.buffs.shield > 0) return; 
-            if (player.dashTime > 0 && ['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo'].includes(player.currentPokemon)) return;
+            if (player.dashTime > 0 && ['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd'].includes(player.currentPokemon)) return;
 
             player.hp -= amount; audioSystem.playSFX('hit'); triggerScreenShake(8, 8); 
             damageTexts.push({ x: player.x + (Math.random()*40-20), y: player.y - 50, text: amount, life: 35, color: '#9b59b6', size: 30 });
@@ -1011,7 +1035,7 @@
 
                 ctx.beginPath(); ctx.ellipse(player.x, player.y + player.radius, player.radius*1.2, player.radius*0.6, 0, 0, Math.PI*2); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
                 
-                // Vẽ Khiên Bất Tử 3s
+                // Vẽ Khiên Bất Tử 3s siêu xịn
                 if(player.buffs.shield > 0) {
                     ctx.save(); 
                     ctx.translate(player.x, player.y); 
@@ -1170,6 +1194,8 @@
                         else if (v.type === 'psychic_fangs') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(120, 0); ctx.lineTo(0, 80); ctx.strokeStyle = `rgba(155, 89, 182, ${v.life/25})`; ctx.lineWidth = 30; ctx.lineJoin = 'miter'; ctx.stroke(); ctx.beginPath(); ctx.moveTo(20, -60); ctx.lineTo(100, 0); ctx.lineTo(20, 60); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/25})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'sunsteel_charge') { ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(243, 156, 18, ${v.life/20})`; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#f1c40f'; ctx.stroke(); }
                         else if (v.type === 'sunsteel_blast') { ctx.beginPath(); ctx.arc(v.x, v.y, 400 - v.life*6, 0, Math.PI*2); ctx.fillStyle = `rgba(243, 156, 18, ${v.life/40})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(255, 255, 255, ${v.life/40})`; ctx.fill(); ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.life * 0.1); for(let j=0; j<8; j++) { ctx.rotate(Math.PI/4); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/40})`; ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, 0); ctx.lineTo(0, 300); ctx.fill(); } ctx.restore(); }
+                        else if (v.type === 'close_combat') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/25})`; for(let j=0; j<5; j++) { ctx.beginPath(); ctx.ellipse((Math.random()-0.5)*100, (Math.random()-0.5)*100, 40, 10, 0, 0, Math.PI*2); ctx.fill(); } ctx.restore(); }
+                        else if (v.type === 'meteor_assault') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(230, 126, 34, ${v.life/35})`; ctx.fill(); ctx.lineWidth = 15; ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/35})`; ctx.stroke(); }
                     }
                     if (v.life <= 0) visualEffects.splice(i, 1);
                 }
