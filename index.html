@@ -112,6 +112,7 @@
         #menuBtnBlaziken.active { background: linear-gradient(135deg, #c0392b, #e74c3c); box-shadow: 0 5px 20px rgba(231, 76, 60, 0.5);}
         #menuBtnSolgaleo.active { background: linear-gradient(135deg, #e67e22, #f1c40f); box-shadow: 0 5px 20px rgba(241, 196, 15, 0.6);}
         #menuBtnSirfetchd.active { background: linear-gradient(135deg, #f1c40f, #27ae60); color: #000; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.6);}
+        #menuBtnInteleon.active { background: linear-gradient(135deg, #0984e3, #00cec9); color: #000; box-shadow: 0 5px 20px rgba(9, 132, 227, 0.5);}
 
         #btnStartGame { 
             padding: 15px 60px; font-size: 24px; font-weight: 900; color: #fff; 
@@ -147,6 +148,7 @@
             background: rgba(44, 62, 80, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.2); 
             padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s; min-width: 150px; 
         }
+        .mapBtn:hover:not(.locked) { background: #e74c3c; border-color: #fff; transform: scale(1.05) translateY(-3px); box-shadow: 0 10px 20px rgba(231,76,60,0.5); }
         .mapBtn.active { background: linear-gradient(45deg, #c0392b, #e74c3c); border-color: #fff; box-shadow: 0 0 15px rgba(231,76,60,0.6); }
         .mapBtn.locked { background: rgba(0,0,0,0.5); color: #555; cursor: not-allowed; border-color: #111; }
         #inGameMapModal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 200; }
@@ -230,7 +232,7 @@
 <body>
     <div id="startMenu">
         <h1>POKÉMON UNITE</h1>
-        <div class="subtitle">AWAKENED ENGINE V8 (MOBILE TOUCH SUPPORT)</div>
+        <div class="subtitle">AWAKENED ENGINE V8 (INTELEON SNIPER)</div>
         
         <div id="heroDisplayArea">
             <div id="previewContainer">
@@ -257,6 +259,7 @@
             <button id="menuBtnBlaziken" class="menuBtn" onclick="previewHero('blaziken')">Blaziken</button>
             <button id="menuBtnSolgaleo" class="menuBtn" onclick="previewHero('solgaleo')">Solgaleo</button>
             <button id="menuBtnSirfetchd" class="menuBtn" onclick="previewHero('sirfetchd')">Sirfetch'd</button>
+            <button id="menuBtnInteleon" class="menuBtn" onclick="previewHero('inteleon')">Inteleon</button>
         </div>
         
         <button id="btnStartGame" onclick="startGame()">BẮT ĐẦU HÀNH TRÌNH</button>
@@ -354,24 +357,25 @@
         function closeMapModal() { document.getElementById('inGameMapModal').style.display = 'none'; }
 
         // ==========================================
-        // DỮ LIỆU TƯỚNG
+        // DỮ LIỆU TƯỚNG (THÊM VA CHẠM RIÊNG)
         // ==========================================
         const pokemonDefs = {
-            pikachu: { name: "PIKACHU", speed: 6.5, glowColor: '#f1c40f', gif: 'https://play.pokemonshowdown.com/sprites/xyani/pikachu.gif', spriteWidth: 45, skills: { q: { name: "Electro Ball", cd: 3000 }, e: { name: "Volt Tackle", cd: 500 }, r: { name: "Thunderbolt", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 } },
-            cinderace: { name: "CINDERACE", speed: 6.2, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/cinderace.gif', spriteWidth: 35, skills: { q: { name: "Ember", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Pyro Ball", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 5 } },
-            greninja: { name: "GRENINJA", speed: 13.0, glowColor: '#3498db', gif: 'https://play.pokemonshowdown.com/sprites/xyani/greninja.gif', spriteWidth: 80, skills: { q: { name: "Water Pulse", cd: 3000 }, e: { name: "Dragon Cut", cd: 500 }, r: { name: "Water Shuriken", cd: 14000 } }, stats: { speed: 5, hp: 4, dmg: 4 } },
-            charizard: { name: "CHARIZARD", speed: 6.0, glowColor: '#d35400', gif: 'https://play.pokemonshowdown.com/sprites/xyani/charizard.gif', spriteWidth: 70, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Flamethrower", cd: 5000 }, r: { name: "Blast Burn", cd: 16000 } }, stats: { speed: 3, hp: 4, dmg: 5 } },
-            dragonite: { name: "DRAGONITE", speed: 5.8, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/dragonite.gif', spriteWidth: 65, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Dragon Breath", cd: 5000 }, r: { name: "Draco Meteor", cd: 18000 } }, stats: { speed: 3, hp: 5, dmg: 4 } },
-            lucario: { name: "LUCARIO", speed: 7.0, glowColor: '#2980b9', gif: 'https://play.pokemonshowdown.com/sprites/xyani/lucario.gif', spriteWidth: 50, skills: { q: { name: "Counter", cd: 4000 }, e: { name: "Force Palm", cd: 500 }, r: { name: "Aura Sphere", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 } },
-            sylveon: { name: "SYLVEON", speed: 6.8, glowColor: '#fd79a8', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sylveon.gif', spriteWidth: 55, skills: { q: { name: "Shadow Ball", cd: 3000 }, e: { name: "Fairy Wind", cd: 500 }, r: { name: "Moonblast", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 4 } },
-            aurorus: { name: "AURORUS", speed: 5.2, glowColor: '#74b9ff', gif: 'https://play.pokemonshowdown.com/sprites/xyani/aurorus.gif', spriteWidth: 80, skills: { q: { name: "Rock Throw", cd: 4000 }, e: { name: "Frost Breath", cd: 5000 }, r: { name: "Meteor Beam", cd: 18000 } }, stats: { speed: 2, hp: 5, dmg: 5 } },
-            sceptile: { name: "SCEPTILE", speed: 12.5, glowColor: '#2ecc71', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sceptile.gif', spriteWidth: 60, skills: { q: { name: "Energy Ball", cd: 3500 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Leaf Storm", cd: 14000 } }, stats: { speed: 5, hp: 3, dmg: 4 } },
-            blaziken: { name: "BLAZIKEN", speed: 6.5, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/blaziken.gif', spriteWidth: 55, skills: { q: { name: "Flare Blitz", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Blaze Kick", cd: 13000 } }, stats: { speed: 4, hp: 3, dmg: 5 } },
-            solgaleo: { name: "SOLGALEO", speed: 6.0, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/solgaleo.gif', spriteWidth: 100, skills: { q: { name: "Solar Beam", cd: 5000 }, e: { name: "Psychic Fangs", cd: 600 }, r: { name: "Sunsteel Strike", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 } },
-            sirfetchd: { name: "SIRFETCH'D", speed: 6.2, glowColor: '#27ae60', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sirfetchd.gif', spriteWidth: 60, skills: { q: { name: "Close Combat", cd: 4000 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Meteor Assault", cd: 15000 } }, stats: { speed: 3, hp: 4, dmg: 5 } }
+            pikachu: { name: "PIKACHU", speed: 6.5, glowColor: '#f1c40f', gif: 'https://play.pokemonshowdown.com/sprites/xyani/pikachu.gif', spriteWidth: 45, collisionRadius: 22, skills: { q: { name: "Electro Ball", cd: 3000 }, e: { name: "Volt Tackle", cd: 500 }, r: { name: "Thunderbolt", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 } },
+            cinderace: { name: "CINDERACE", speed: 6.2, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/cinderace.gif', spriteWidth: 35, collisionRadius: 22, skills: { q: { name: "Ember", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Pyro Ball", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 5 } },
+            greninja: { name: "GRENINJA", speed: 13.0, glowColor: '#3498db', gif: 'https://play.pokemonshowdown.com/sprites/xyani/greninja.gif', spriteWidth: 80, collisionRadius: 22, skills: { q: { name: "Water Pulse", cd: 3000 }, e: { name: "Dragon Cut", cd: 500 }, r: { name: "Water Shuriken", cd: 14000 } }, stats: { speed: 5, hp: 4, dmg: 4 } },
+            charizard: { name: "CHARIZARD", speed: 6.0, glowColor: '#d35400', gif: 'https://play.pokemonshowdown.com/sprites/xyani/charizard.gif', spriteWidth: 70, collisionRadius: 22, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Flamethrower", cd: 5000 }, r: { name: "Blast Burn", cd: 16000 } }, stats: { speed: 3, hp: 4, dmg: 5 } },
+            dragonite: { name: "DRAGONITE", speed: 5.8, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/dragonite.gif', spriteWidth: 65, collisionRadius: 22, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Dragon Breath", cd: 5000 }, r: { name: "Draco Meteor", cd: 18000 } }, stats: { speed: 3, hp: 5, dmg: 4 } },
+            lucario: { name: "LUCARIO", speed: 7.0, glowColor: '#2980b9', gif: 'https://play.pokemonshowdown.com/sprites/xyani/lucario.gif', spriteWidth: 50, collisionRadius: 22, skills: { q: { name: "Counter", cd: 4000 }, e: { name: "Force Palm", cd: 500 }, r: { name: "Aura Sphere", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 } },
+            sylveon: { name: "SYLVEON", speed: 6.8, glowColor: '#fd79a8', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sylveon.gif', spriteWidth: 55, collisionRadius: 22, skills: { q: { name: "Shadow Ball", cd: 3000 }, e: { name: "Fairy Wind", cd: 500 }, r: { name: "Moonblast", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 4 } },
+            aurorus: { name: "AURORUS", speed: 5.2, glowColor: '#74b9ff', gif: 'https://play.pokemonshowdown.com/sprites/xyani/aurorus.gif', spriteWidth: 80, collisionRadius: 22, skills: { q: { name: "Rock Throw", cd: 4000 }, e: { name: "Frost Breath", cd: 5000 }, r: { name: "Meteor Beam", cd: 18000 } }, stats: { speed: 2, hp: 5, dmg: 5 } },
+            sceptile: { name: "SCEPTILE", speed: 12.5, glowColor: '#2ecc71', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sceptile.gif', spriteWidth: 60, collisionRadius: 22, skills: { q: { name: "Energy Ball", cd: 3500 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Leaf Storm", cd: 14000 } }, stats: { speed: 5, hp: 3, dmg: 4 } },
+            blaziken: { name: "BLAZIKEN", speed: 6.5, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/blaziken.gif', spriteWidth: 55, collisionRadius: 22, skills: { q: { name: "Flare Blitz", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Blaze Kick", cd: 13000 } }, stats: { speed: 4, hp: 3, dmg: 5 } },
+            solgaleo: { name: "SOLGALEO", speed: 6.0, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/solgaleo.gif', spriteWidth: 100, collisionRadius: 22, skills: { q: { name: "Solar Beam", cd: 5000 }, e: { name: "Psychic Fangs", cd: 600 }, r: { name: "Sunsteel Strike", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 } },
+            sirfetchd: { name: "SIRFETCH'D", speed: 6.2, glowColor: '#27ae60', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sirfetchd.gif', spriteWidth: 60, collisionRadius: 22, skills: { q: { name: "Close Combat", cd: 4000 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Meteor Assault", cd: 15000 } }, stats: { speed: 3, hp: 4, dmg: 5 } },
+            inteleon: { name: "INTELEON", speed: 6.5, glowColor: '#0984e3', gif: 'https://play.pokemonshowdown.com/sprites/xyani/inteleon.gif', spriteWidth: 30, collisionRadius: 12, skills: { q: { name: "Hydro Pump", cd: 4000 }, e: { name: "Surf", cd: 500 }, r: { name: "Snipe Shot", cd: 12000 } }, stats: { speed: 4, hp: 3, dmg: 5 } }
         };
 
-        const player = { x: 0, y: 0, currentPokemon: 'pikachu', radius: 22, facingRight: false, isCasting: false, attackFrames: 0, isMoving: false, walkFrame: 0, dashTime: 0, dashAngle: 0, dashSpeed: 0, dashDamage: 0, level: 1, xp: 0, maxXp: 100, maxHp: 1000, hp: 1000, upgradePoints: 0, skillLevels: { q: 1, e: 1, r: 1 }, animRot: 0, animOffsetY: 0, animSqueezeX: 1, animSqueezeY: 1, buffs: { damage: 0, speed: 0, shield: 0 } };
+        const player = { x: 0, y: 0, currentPokemon: 'pikachu', facingRight: false, isCasting: false, attackFrames: 0, isMoving: false, walkFrame: 0, dashTime: 0, dashAngle: 0, dashSpeed: 0, dashDamage: 0, level: 1, xp: 0, maxXp: 100, maxHp: 1000, hp: 1000, upgradePoints: 0, skillLevels: { q: 1, e: 1, r: 1 }, animRot: 0, animOffsetY: 0, animSqueezeX: 1, animSqueezeY: 1, buffs: { damage: 0, speed: 0, shield: 0 } };
         const cooldowns = { z: 0, q: 0, e: 0, r: 0 }; const keys = {}; let mouseX = 0, mouseY = 0;
 
         function renderStars(containerId, value) {
@@ -390,7 +394,7 @@
             renderStars('stat-hp', pokemonDefs[heroName].stats.hp);
             renderStars('stat-dmg', pokemonDefs[heroName].stats.dmg);
         }
-        window.onload = () => { previewHero('sirfetchd'); } 
+        window.onload = () => { previewHero('inteleon'); } 
 
         const mobTypes = [
             { name: "Caterpie", baseHp: 400, speed: 2.0, baseDmg: 20, baseXp: 20, gif: 'https://play.pokemonshowdown.com/sprites/xyani/caterpie.gif', size: 35, aggroRange: 375 }, { name: "Oddish", baseHp: 500, speed: 1.8, baseDmg: 25, baseXp: 25, gif: 'https://play.pokemonshowdown.com/sprites/xyani/oddish.gif', size: 35, aggroRange: 375 }, { name: "Aipom", baseHp: 600, speed: 3.5, baseDmg: 35, baseXp: 35, gif: 'https://play.pokemonshowdown.com/sprites/xyani/aipom.gif', size: 40, aggroRange: 600 }, { name: "Bulbasaur", baseHp: 800, speed: 2.0, baseDmg: 40, baseXp: 40, gif: 'https://play.pokemonshowdown.com/sprites/xyani/bulbasaur.gif', size: 45, aggroRange: 450 }, { name: "Audino", baseHp: 1000, speed: 1.5, baseDmg: 30, baseXp: 60, gif: 'https://play.pokemonshowdown.com/sprites/xyani/audino.gif', size: 40, aggroRange: 375 },
@@ -707,6 +711,7 @@
             else if (player.currentPokemon === 'blaziken') effectType = 'fire_kick';
             else if (player.currentPokemon === 'solgaleo') effectType = 'sun_slash';
             else if (player.currentPokemon === 'sirfetchd') effectType = 'leaf_blade_basic';
+            else if (player.currentPokemon === 'inteleon') effectType = 'water_pulse';
 
             visualEffects.push({ x: attackX, y: attackY, angle: angle, type: effectType, life: 15, isRed: player.buffs.damage > 0 });
             dealAoEDamage(attackX, attackY, 130, basicDmg, isCrit); playBasicAttackAnimation();
@@ -729,14 +734,14 @@
 
             if (key === 'z') { 
                 audioSystem.playSFX('dash');
-                cooldowns['z'] = (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd'].includes(player.currentPokemon)) ? 500 : 1000; 
+                cooldowns['z'] = (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd', 'inteleon'].includes(player.currentPokemon)) ? 500 : 1000; 
                 startDash(angle, 50, 8, 0); visualEffects.push({ x: player.x, y: player.y, type: 'explosion', life: 12 }); return; 
             }
 
             const def = pokemonDefs[player.currentPokemon]; let skillLv = player.skillLevels[key]; let cdReduction = 1 - (0.1 * (skillLv - 1)); if (cdReduction < 0.2) cdReduction = 0.2; 
             
             if (key === 'e') {
-                if (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd'].includes(player.currentPokemon)) {
+                if (['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd', 'inteleon'].includes(player.currentPokemon)) {
                     cooldowns[key] = 500; 
                 } else {
                     cooldowns[key] = Math.round(5000 * cdReduction); 
@@ -864,6 +869,25 @@
                         dealAoEDamage(player.x, player.y, 250, Math.round((2500 + lvDmg * 5) * dmgMultiplier), false);
                     }, 200);
                 }
+            } else if (player.currentPokemon === 'inteleon') {
+                if (key === 'q') {
+                    triggerScreenShake(15, 15);
+                    fireProjectile(1, 25, 50, 'hydro_pump', Math.round((400 + lvDmg) * dmgMultiplier), 0, false, angle);
+                }
+                if (key === 'e') {
+                    startDash(angle, 40, 15, Math.round((300 + lvDmg) * dmgMultiplier));
+                    setTimeout(() => {
+                        visualEffects.push({ x: player.x, y: player.y, type: 'surf_wave', life: 25 });
+                        dealAoEDamage(player.x, player.y, 200, Math.round((500 + lvDmg) * dmgMultiplier), false);
+                    }, 200);
+                }
+                if (key === 'r') {
+                    triggerScreenShake(30, 20);
+                    visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'sniper_aim', life: 20 });
+                    setTimeout(() => {
+                        fireProjectile(1, 60, 40, 'snipe_shot', Math.round((2500 + lvDmg * 5) * dmgMultiplier), 0, false, angle);
+                    }, 200);
+                }
             }
         }
 
@@ -874,7 +898,7 @@
             let originX = isEnemy ? mewtwoBoss.x : player.x; let originY = isEnemy ? mewtwoBoss.y : player.y;
             for (let i = 0; i < count; i++) {
                 let a = angleBase; if (count > 1) { a += (i - (count - 1) / 2) * spreadAngle; }
-                let isPierceR = !isEnemy && (type === 'shuriken' || type === 'fire' || type === 'aura_sphere' || type === 'shadow_ball' || type === 'frost' || type === 'energy_ball' || type === 'leaf' || type === 'solar_beam') && size >= 40;
+                let isPierceR = !isEnemy && (type === 'shuriken' || type === 'fire' || type === 'aura_sphere' || type === 'shadow_ball' || type === 'frost' || type === 'rock_throw' || type === 'energy_ball' || type === 'leaf' || type === 'solar_beam' || type === 'hydro_pump' || type === 'snipe_shot');
                 let lifeSpan = isPierceR ? 40 : undefined;
                 projectiles.push({ x: originX, y: originY, type: type, radius: size, dmg: damage, rotation: a, vx: Math.cos(a)*speed, vy: Math.sin(a)*speed, life: lifeSpan, piercedMobs: isPierceR ? [] : undefined, isEnemy: isEnemy });
             }
@@ -912,7 +936,7 @@
 
         function takePlayerDamage(amount) {
             if (!isPlaying || player.buffs.shield > 0) return; 
-            if (player.dashTime > 0 && ['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd'].includes(player.currentPokemon)) return;
+            if (player.dashTime > 0 && ['pikachu', 'cinderace', 'greninja', 'lucario', 'sylveon', 'sceptile', 'blaziken', 'solgaleo', 'sirfetchd', 'inteleon'].includes(player.currentPokemon)) return;
 
             player.hp -= amount; audioSystem.playSFX('hit'); triggerScreenShake(8, 8); 
             damageTexts.push({ x: player.x + (Math.random()*40-20), y: player.y - 50, text: amount, life: 35, color: '#9b59b6', size: 30 });
@@ -970,21 +994,23 @@
             if(player.buffs.speed > 0) buffsUI.innerHTML += `<div class="buff-icon" style="color:#3498db; border-color:#3498db;">⚡</div>`;
             if(player.buffs.shield > 0) buffsUI.innerHTML += `<div class="buff-icon" style="color:#f1c40f; border-color:#f1c40f;">🛡️</div>`;
 
+            const currentCollisionRadius = pokemonDefs[player.currentPokemon].collisionRadius;
+
             for (let i = fruits.length - 1; i >= 0; i--) {
                 let f = fruits[i]; const dist = Math.hypot(player.x - f.x, player.y - f.y);
-                if (dist < player.radius + f.radius + 150) { const angle = Math.atan2(player.y - f.y, player.x - f.x); f.x += Math.cos(angle) * 12; f.y += Math.sin(angle) * 12; }
-                if (dist < player.radius + f.radius) { player.hp = Math.min(player.maxHp, player.hp + f.type.heal); audioSystem.playSFX('heal'); damageTexts.push({ x: player.x, y: player.y - 60, text: "+" + f.type.heal, life: 50, color: "#2ecc71", size: 30 }); document.getElementById('playerHpFill').style.width = (player.hp / player.maxHp * 100) + '%'; fruits.splice(i, 1); setTimeout(spawnFruit, 8000); }
+                if (dist < currentCollisionRadius + f.radius + 150) { const angle = Math.atan2(player.y - f.y, player.x - f.x); f.x += Math.cos(angle) * 12; f.y += Math.sin(angle) * 12; }
+                if (dist < currentCollisionRadius + f.radius) { player.hp = Math.min(player.maxHp, player.hp + f.type.heal); audioSystem.playSFX('heal'); damageTexts.push({ x: player.x, y: player.y - 60, text: "+" + f.type.heal, life: 50, color: "#2ecc71", size: 30 }); document.getElementById('playerHpFill').style.width = (player.hp / player.maxHp * 100) + '%'; fruits.splice(i, 1); setTimeout(spawnFruit, 8000); }
             }
 
             for (let i = expOrbs.length - 1; i >= 0; i--) {
                 let o = expOrbs[i]; o.life--; const dist = Math.hypot(player.x - o.x, player.y - o.y);
                 if(dist < 250) { const angle = Math.atan2(player.y - o.y, player.x - o.x); o.x += Math.cos(angle) * 15; o.y += Math.sin(angle) * 15; }
-                if (dist < player.radius + o.radius) { gainXp(o.value); expOrbs.splice(i, 1); } else if (o.life <= 0) { expOrbs.splice(i, 1); }
+                if (dist < currentCollisionRadius + o.radius) { gainXp(o.value); expOrbs.splice(i, 1); } else if (o.life <= 0) { expOrbs.splice(i, 1); }
             }
 
             for (let i = powerups.length - 1; i >= 0; i--) {
                 let p = powerups[i]; p.life--; const dist = Math.hypot(player.x - p.x, player.y - p.y);
-                if (dist < player.radius + p.radius) { audioSystem.playSFX('powerup'); if(p.type==='damage') player.buffs.damage = 10000; if(p.type==='speed') player.buffs.speed = 10000; if(p.type==='shield') player.buffs.shield = 5000; powerups.splice(i, 1); } else if (p.life <= 0) { powerups.splice(i, 1); }
+                if (dist < currentCollisionRadius + p.radius) { audioSystem.playSFX('powerup'); if(p.type==='damage') player.buffs.damage = 10000; if(p.type==='speed') player.buffs.speed = 10000; if(p.type==='shield') player.buffs.shield = 5000; powerups.splice(i, 1); } else if (p.life <= 0) { powerups.splice(i, 1); }
             }
 
             ['z', 'q', 'e', 'r'].forEach(key => {
@@ -1002,7 +1028,7 @@
             if (document.getElementById('inGameMapModal').style.display !== 'block') {
                 if (player.dashTime > 0) {
                     player.dashTime--; player.x += Math.cos(player.dashAngle) * player.dashSpeed; player.y += Math.sin(player.dashAngle) * player.dashSpeed;
-                    if (player.dashDamage > 0) { dealAoEDamage(player.x, player.y, player.radius + 50, player.dashDamage / 5, false); }
+                    if (player.dashDamage > 0) { dealAoEDamage(player.x, player.y, currentCollisionRadius + 50, player.dashDamage / 5, false); }
                     footstepDust.push({ x: player.x, y: player.y + 10, life: 10, size: 20 });
                 } else if (!player.isCasting) { 
                     let dx = 0, dy = 0; 
@@ -1022,9 +1048,9 @@
                 }
             }
 
-            const pos = resolveTreeCollision(player.x, player.y, player.radius); player.x = pos.x; player.y = pos.y;
-            if (player.x < player.radius) player.x = player.radius; if (player.x > WORLD_WIDTH - player.radius) player.x = WORLD_WIDTH - player.radius;
-            if (player.y < player.radius) player.y = player.radius; if (player.y > WORLD_HEIGHT - player.radius) player.y = WORLD_HEIGHT - player.radius;
+            const pos = resolveTreeCollision(player.x, player.y, currentCollisionRadius); player.x = pos.x; player.y = pos.y;
+            if (player.x < currentCollisionRadius) player.x = currentCollisionRadius; if (player.x > WORLD_WIDTH - currentCollisionRadius) player.x = WORLD_WIDTH - currentCollisionRadius;
+            if (player.y < currentCollisionRadius) player.y = currentCollisionRadius; if (player.y > WORLD_HEIGHT - currentCollisionRadius) player.y = WORLD_HEIGHT - currentCollisionRadius;
             
             if (canvas.width > 0 && canvas.height > 0 && !isNaN(player.x) && !isNaN(player.y)) {
                 let targetCamX = Math.max(0, Math.min(player.x - canvas.width / 2, WORLD_WIDTH - canvas.width)); 
@@ -1069,12 +1095,12 @@
                         else if (randomSkill === 5) { for(let k = 0; k < 5; k++) { setTimeout(() => { if(!mob.isDead) fireProjectile(1, 16, 50, 'fire', 800, 0, true, angle + (Math.random()*0.4 - 0.2)); }, k * 250); } mob.shootCooldown = 3000; }
                     }
                     if (mob.attackCooldown > 0) mob.attackCooldown--;
-                    if (distToPlayer < mob.radius + player.radius + 20 && mob.attackCooldown <= 0) { takePlayerDamage(mob.damage); mob.attackCooldown = 50; }
+                    if (distToPlayer < mob.radius + currentCollisionRadius + 20 && mob.attackCooldown <= 0) { takePlayerDamage(mob.damage); mob.attackCooldown = 50; }
                 } 
                 else {
                     if (mob.attackCooldown > 0) mob.attackCooldown--;
                     if (distToPlayer < mob.type.aggroRange) {
-                        if (distToPlayer > mob.radius + player.radius + 15) {
+                        if (distToPlayer > mob.radius + currentCollisionRadius + 15) {
                             const angle = Math.atan2(player.y - mob.y, player.x - mob.x); mob.x += Math.cos(angle) * mob.type.speed; mob.y += Math.sin(angle) * mob.type.speed;
                             if(mob.imgElement) { mob.imgElement.style.transform = `scaleX(${Math.cos(angle) > 0 ? -1 : 1})`; }
                         } else {
@@ -1108,12 +1134,12 @@
                 p.rotation += 0.5;
 
                 if (p.isEnemy) {
-                    if (Math.hypot(p.x - player.x, p.y - player.y) < p.radius + player.radius) { takePlayerDamage(p.dmg); projectiles.splice(i, 1); continue; }
+                    if (Math.hypot(p.x - player.x, p.y - player.y) < p.radius + currentCollisionRadius) { takePlayerDamage(p.dmg); projectiles.splice(i, 1); continue; }
                     if (p.x < 0 || p.x > WORLD_WIDTH || p.y < 0 || p.y > WORLD_HEIGHT) { projectiles.splice(i, 1); continue; } continue; 
                 }
                 
-                let isSpecial = (p.type === 'electric' || p.type === 'fire' || p.type === 'shuriken' || p.type === 'boss_laser' || p.type === 'aura_sphere' || p.type === 'shadow_ball' || p.type === 'frost' || p.type === 'rock_throw' || p.type === 'energy_ball' || p.type === 'leaf' || p.type === 'solar_beam') && p.radius >= 40;
-                let isPierceR = (p.type === 'shuriken' || p.type === 'fire' || p.type === 'boss_laser' || p.type === 'aura_sphere' || p.type === 'shadow_ball' || p.type === 'frost' || p.type === 'rock_throw' || p.type === 'energy_ball' || p.type === 'leaf' || p.type === 'solar_beam') && p.radius >= 40 && p.life !== undefined;
+                let isSpecial = (p.type === 'electric' || p.type === 'fire' || p.type === 'shuriken' || p.type === 'boss_laser' || p.type === 'aura_sphere' || p.type === 'shadow_ball' || p.type === 'frost' || p.type === 'rock_throw' || p.type === 'energy_ball' || p.type === 'leaf' || p.type === 'solar_beam' || p.type === 'hydro_pump' || p.type === 'snipe_shot') && p.radius >= 40;
+                let isPierceR = (p.type === 'shuriken' || p.type === 'fire' || p.type === 'boss_laser' || p.type === 'aura_sphere' || p.type === 'shadow_ball' || p.type === 'frost' || p.type === 'rock_throw' || p.type === 'energy_ball' || p.type === 'leaf' || p.type === 'solar_beam' || p.type === 'hydro_pump' || p.type === 'snipe_shot') && p.life !== undefined;
                 
                 let hitTree = false, passedTree = null;
                 if (!isSpecial) { for(let t of trees) { if (Math.hypot(p.x - t.x, p.y - t.y) < p.radius + t.radius - 20) { hitTree = true; break; } } } 
@@ -1165,15 +1191,16 @@
                     }
                 });
 
-                ctx.beginPath(); ctx.ellipse(player.x, player.y + player.radius, player.radius*1.2, player.radius*0.6, 0, 0, Math.PI*2); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
+                const currentCollisionRadius = pokemonDefs[player.currentPokemon].collisionRadius;
+                ctx.beginPath(); ctx.ellipse(player.x, player.y + currentCollisionRadius, currentCollisionRadius*1.2, currentCollisionRadius*0.6, 0, 0, Math.PI*2); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
                 
-                // Vẽ Khiên Bất Tử 3s
+                // Vẽ Khiên Bất Tử 3s siêu xịn
                 if(player.buffs.shield > 0) {
                     ctx.save(); 
                     ctx.translate(player.x, player.y); 
                     ctx.rotate(Date.now()/200);
                     
-                    let shieldRadius = Math.max(player.radius + 45, pokemonDefs[player.currentPokemon].spriteWidth / 2 + 35);
+                    let shieldRadius = Math.max(currentCollisionRadius + 45, pokemonDefs[player.currentPokemon].spriteWidth / 2 + 35);
                     
                     ctx.beginPath(); 
                     ctx.arc(0, 0, shieldRadius, 0, Math.PI*2); 
@@ -1291,6 +1318,8 @@
                     else if (p.type === 'energy_ball') { ctx.beginPath(); ctx.arc(0,0,p.radius,0,Math.PI*2); ctx.fillStyle = '#2ecc71'; ctx.fill(); ctx.beginPath(); ctx.arc(0,0,p.radius*0.6,0,Math.PI*2); ctx.fillStyle = '#a8ffcc'; ctx.fill(); }
                     else if (p.type === 'leaf') { ctx.rotate(p.rotation); ctx.fillStyle = '#27ae60'; ctx.beginPath(); ctx.ellipse(0, 0, p.radius, p.radius*0.4, 0, 0, Math.PI*2); ctx.fill(); }
                     else if (p.type === 'solar_beam') { ctx.rotate(p.rotation); ctx.fillStyle = '#2ecc71'; ctx.fillRect(-p.radius, -p.radius/2, p.radius * 6, p.radius); ctx.fillStyle = '#f1c40f'; ctx.fillRect(-p.radius, -p.radius/4, p.radius * 6, p.radius/2); ctx.beginPath(); ctx.arc(0, 0, p.radius, 0, Math.PI*2); ctx.fillStyle = 'rgba(46, 204, 113, 0.8)'; ctx.fill(); }
+                    else if (p.type === 'hydro_pump') { ctx.rotate(p.rotation); ctx.fillStyle = '#0984e3'; ctx.fillRect(-p.radius, -p.radius/2, p.radius * 6, p.radius); ctx.fillStyle = '#74b9ff'; ctx.fillRect(-p.radius, -p.radius/4, p.radius * 6, p.radius/2); ctx.beginPath(); ctx.arc(0, 0, p.radius, 0, Math.PI*2); ctx.fillStyle = 'rgba(9, 132, 227, 0.8)'; ctx.fill(); }
+                    else if (p.type === 'snipe_shot') { ctx.rotate(p.rotation); ctx.fillStyle = '#00cec9'; ctx.beginPath(); ctx.ellipse(0, 0, p.radius*2, p.radius*0.3, 0, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(0, 0, p.radius, p.radius*0.15, 0, 0, Math.PI*2); ctx.fill(); }
                     else { ctx.beginPath(); ctx.arc(0,0,p.radius,0,Math.PI*2); ctx.fillStyle = '#ecf0f1'; ctx.fill(); }
                     ctx.restore();
                 });
@@ -1306,7 +1335,7 @@
                         else if (v.type === 'blast_burn') { ctx.beginPath(); ctx.arc(v.x, v.y, 300 - v.life*5, 0, Math.PI*2); ctx.fillStyle = `rgba(211, 84, 0, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 200 - v.life*3, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); }
                         else if (v.type === 'meteor') { ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(230, 126, 34, ${v.life/30})`; ctx.fill(); }
                         else if (v.type === 'aura_blast') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(52, 152, 219, ${v.life/25})`; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#fff'; ctx.stroke(); }
-                        else if (v.type === 'trail') { ctx.beginPath(); ctx.arc(v.x, v.y, player.radius, 0, Math.PI*2); ctx.fillStyle = `rgba(52, 152, 219, ${v.life/15})`; ctx.fill(); }
+                        else if (v.type === 'trail') { ctx.beginPath(); ctx.arc(v.x, v.y, pokemonDefs[player.currentPokemon].collisionRadius, 0, Math.PI*2); ctx.fillStyle = `rgba(52, 152, 219, ${v.life/15})`; ctx.fill(); }
                         else if (v.type === 'iron_tail') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2, Math.PI/2); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(189, 195, 199, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'fire_kick') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 100 + (15-v.life)*2, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = `rgba(231, 76, 60, ${v.life/15})`; ctx.lineWidth = 35; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 70 + (15-v.life), -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(241, 196, 15, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'basic_cut') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(52, 152, 219, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
@@ -1328,6 +1357,9 @@
                         else if (v.type === 'sunsteel_blast') { ctx.beginPath(); ctx.arc(v.x, v.y, 400 - v.life*6, 0, Math.PI*2); ctx.fillStyle = `rgba(243, 156, 18, ${v.life/40})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(255, 255, 255, ${v.life/40})`; ctx.fill(); ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.life * 0.1); for(let j=0; j<8; j++) { ctx.rotate(Math.PI/4); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/40})`; ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, 0); ctx.lineTo(0, 300); ctx.fill(); } ctx.restore(); }
                         else if (v.type === 'close_combat') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/25})`; for(let j=0; j<5; j++) { ctx.beginPath(); ctx.ellipse((Math.random()-0.5)*100, (Math.random()-0.5)*100, 40, 10, 0, 0, Math.PI*2); ctx.fill(); } ctx.restore(); }
                         else if (v.type === 'meteor_assault') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(230, 126, 34, ${v.life/35})`; ctx.fill(); ctx.lineWidth = 15; ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/35})`; ctx.stroke(); }
+                        else if (v.type === 'water_pulse') { ctx.beginPath(); ctx.arc(v.x, v.y, 130 - v.life*4, 0, Math.PI*2); ctx.strokeStyle = `rgba(9, 132, 227, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.beginPath(); ctx.arc(v.x, v.y, 90 - v.life*3, 0, Math.PI*2); ctx.strokeStyle = `rgba(116, 185, 255, ${v.life/15})`; ctx.lineWidth = 8; ctx.stroke(); }
+                        else if (v.type === 'surf_wave') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(9, 132, 227, ${v.life/25})`; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/25})`; ctx.stroke(); }
+                        else if (v.type === 'sniper_aim') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.strokeStyle = `rgba(231, 76, 60, ${v.life/20})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(2000, 0); ctx.stroke(); ctx.restore(); }
                     }
                     if (v.life <= 0) visualEffects.splice(i, 1);
                 }
