@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pokemon Unite - Ultimate Awakened Engine V8</title>
     <style>
-        /* ==========================================================================
-           [1] CSS RESET & BASE LAYOUT
-           ========================================================================== */
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
         body { overflow: hidden; background-color: #050505; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; user-select: none; -webkit-user-select: none; }
         
@@ -16,9 +13,6 @@
         #dayNightOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; background-color: rgba(0, 0, 30, 0); transition: background-color 5s linear; }
         #bloodVignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; background: radial-gradient(circle at center, transparent 40%, rgba(255, 0, 0, 0.4) 100%); opacity: 0; transition: opacity 0.2s; }
         
-        /* ==========================================================================
-           [2] MAIN MENU UI
-           ========================================================================== */
         #startMenu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e272e 0%, #000000 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
         #startMenu h1 { font-size: 65px; color: #f1c40f; text-align: center; text-shadow: 0 15px 40px rgba(241,196,15,0.4), 0 0 15px rgba(255,255,255,0.2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 8px; font-weight: 900; }
         @media (max-width: 768px) { #startMenu h1 { font-size: 40px; letter-spacing: 4px;} }
@@ -44,7 +38,6 @@
         .menuBtn:hover { transform: translateY(-3px); background: #34495e; border-color: #bdc3c7;}
         .menuBtn.active { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 25px rgba(255,255,255,0.4); border-width: 3px;}
         
-        /* Màu gradient riêng theo từng hệ của Pokémon */
         #menuBtnPikachu.active { background: linear-gradient(135deg, #f39c12, #f1c40f); color: #000; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5);} 
         #menuBtnCinderace.active { background: linear-gradient(135deg, #d35400, #e74c3c); box-shadow: 0 5px 20px rgba(231, 76, 60, 0.5);} 
         #menuBtnGreninja.active { background: linear-gradient(135deg, #2980b9, #3498db); box-shadow: 0 5px 20px rgba(52, 152, 219, 0.5);}
@@ -71,9 +64,6 @@
         #btnStartGame:hover { transform: scale(1.05) translateY(-3px); background: linear-gradient(45deg, #f39c12, #f1c40f); box-shadow: 0 15px 40px rgba(241, 196, 15, 0.6); color: #000; }
         @keyframes pulsePlay { 0% { box-shadow: 0 0 10px rgba(46, 204, 113, 0.4); transform: scale(1); } 100% { box-shadow: 0 0 30px rgba(46, 204, 113, 0.8); transform: scale(1.02); } }
 
-        /* ==========================================================================
-           [3] IN-GAME UI
-           ========================================================================== */
         #inGameMapBtn { position: absolute; top: 15px; left: 15px; z-index: 50; background: rgba(41, 128, 185, 0.5); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.3s; backdrop-filter: blur(5px); text-transform: uppercase; }
         #inGameMapBtn:hover { transform: scale(1.05); background: rgba(52, 152, 219, 0.8); border-color: #fff;}
         .mapSelectionContainer { background: rgba(15, 15, 20, 0.95); padding: 30px; border-radius: 15px; text-align: center; border: 2px solid rgba(255,255,255,0.1); width: 80%; max-width: 700px; box-shadow: 0 20px 60px rgba(0,0,0,1); backdrop-filter: blur(15px); }
@@ -120,7 +110,6 @@
         
         .skill-lock { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; z-index: 5; pointer-events: none; }
         
-        /* Nút Mega Evolution */
         #megaBtnContainer { display: none; position: absolute; left: -70px; top: -20px; flex-direction: column; align-items: center; }
         .mega-btn { width: 55px; height: 55px; background: radial-gradient(circle, #8e44ad, #2980b9); border-radius: 50%; border: 3px solid #f1c40f; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(142, 68, 173, 0.8), inset 0 0 10px rgba(0,0,0,0.8); animation: pulseMega 1s infinite alternate; pointer-events: auto;}
         .mega-btn:active { transform: scale(0.9); }
@@ -131,7 +120,6 @@
         #xpBarFill { height: 100%; width: 0%; background: linear-gradient(90deg, #e67e22, #f1c40f); transition: width 0.3s ease-out; position: absolute; left: 0; top: 0; box-shadow: 0 0 8px rgba(241,196,15,0.5);}
         #levelText { position: relative; z-index: 2; font-weight: 900; font-size: 11px; color: white; text-shadow: 0 0 3px #000, 1px 1px 2px #000; letter-spacing: 2px; }
         
-        /* DOM PLAYERS & MOBS */
         #playerContainer { position: absolute; z-index: 10; pointer-events: none; transform: translate(-50%, -50%); transition: filter 0.1s; will-change: transform; left: 0; top: 0;}
         #playerSprite { display: block; height: auto; filter: drop-shadow(0px 10px 8px rgba(0,0,0,0.7)); transform-origin: bottom center; will-change: transform; }
         #playerInfo { position: absolute; top: -45px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; width: 100px; }
@@ -145,9 +133,6 @@
         .mob-hp-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #c0392b); border-radius: 1px; transition: width 0.1s; }
         .mob-lvl { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); background: rgba(44,62,80,0.9); color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: bold; border: 1px solid #f1c40f; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
-        /* ==========================================================================
-           [4] MOBILE CONTROLS UI
-           ========================================================================== */
         #mobile-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none; }
         #joystick-zone { position: absolute; bottom: 0; left: 0; width: 50%; height: 50%; pointer-events: auto; }
         #joystick-base { position: absolute; bottom: 40px; left: 40px; width: 130px; height: 130px; background: rgba(255,255,255,0.15); border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); transition: opacity 0.2s; opacity: 0.7; pointer-events: none; }
@@ -320,7 +305,7 @@
             blastoise: { name: "BLASTOISE", speed: 7.8, glowColor: '#0984e3', gif: 'https://play.pokemonshowdown.com/sprites/xyani/blastoise.gif', megaGif: 'blastoise-mega', spriteWidth: 75, collisionRadius: 25, skills: { q: { name: "Hydro Pump", cd: 4000 }, e: { name: "Water Spout", cd: 500 }, r: { name: "Hydro Cannon", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Squirtle", img: "squirtle", width: 35}, {lvl: 5, name: "Wartortle", img: "wartortle", width: 50}, {lvl: 10, name: "Blastoise", img: "blastoise", width: 75}] },
             dragonite: { name: "DRAGONITE", speed: 7.8, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/dragonite.gif', spriteWidth: 65, collisionRadius: 22, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Dragon Breath", cd: 5000 }, r: { name: "Draco Meteor", cd: 18000 } }, stats: { speed: 3, hp: 5, dmg: 4 }, stages: [{lvl: 1, name: "Dratini", img: "dratini", width: 35}, {lvl: 5, name: "Dragonair", img: "dragonair", width: 55}, {lvl: 10, name: "Dragonite", img: "dragonite", width: 65}] },
             garchomp: { name: "GARCHOMP", speed: 8.5, glowColor: '#9b59b6', gif: 'https://play.pokemonshowdown.com/sprites/xyani/garchomp.gif', megaGif: 'garchomp-mega', spriteWidth: 75, collisionRadius: 25, skills: { q: { name: "Earthquake", cd: 4000 }, e: { name: "Dragon Claw", cd: 500 }, r: { name: "Dragon Rush", cd: 15000 } }, stats: { speed: 4, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Gible", img: "gible", width: 35}, {lvl: 5, name: "Gabite", img: "gabite", width: 55}, {lvl: 10, name: "Garchomp", img: "garchomp", width: 75}] },
-            dragapult: { name: "DRAGAPULT", speed: 10.0, glowColor: '#9b59b6', gif: 'https://play.pokemonshowdown.com/sprites/xyani/dragapult.gif', spriteWidth: 70, collisionRadius: 22, skills: { q: { name: "Shadow Ball", cd: 3000 }, e: { name: "Breaking Swipe", cd: 4000 }, r: { name: "Dragon Darts", cd: 13000 } }, stats: { speed: 5, hp: 3, dmg: 5 }, stages: [{lvl: 1, name: "Dreepy", img: "dreepy", width: 40}, {lvl: 5, name: "Drakloak", img: "drakloak", width: 60}, {lvl: 10, name: "Dragapult", img: "dragapult", width: 70}] },
+            dragapult: { name: "DRAGAPULT", speed: 10.0, glowColor: '#9b59b6', gif: 'https://play.pokemonshowdown.com/sprites/xyani/dragapult.gif', spriteWidth: 70, collisionRadius: 22, skills: { q: { name: "Shadow Ball", cd: 3000 }, e: { name: "Breaking Swipe", cd: 4000 }, r: { name: "Dragon Darts", cd: 13000 } }, stats: { speed: 5, hp: 3, dmg: 5 }, stages: [{lvl: 1, name: "Dreepy", img: "dreepy", width: 30}, {lvl: 5, name: "Drakloak", img: "drakloak", width: 50}, {lvl: 10, name: "Dragapult", img: "dragapult", width: 70}] },
             lucario: { name: "LUCARIO", speed: 9.0, glowColor: '#2980b9', gif: 'https://play.pokemonshowdown.com/sprites/xyani/lucario.gif', megaGif: 'lucario-mega', spriteWidth: 50, collisionRadius: 22, skills: { q: { name: "Counter", cd: 4000 }, e: { name: "Force Palm", cd: 500 }, r: { name: "Aura Sphere", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Riolu", img: "riolu", width: 35}, {lvl: 10, name: "Lucario", img: "lucario", width: 50}] },
             sylveon: { name: "SYLVEON", speed: 8.8, glowColor: '#fd79a8', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sylveon.gif', spriteWidth: 55, collisionRadius: 22, skills: { q: { name: "Shadow Ball", cd: 3000 }, e: { name: "Fairy Wind", cd: 500 }, r: { name: "Moonblast", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 4 }, stages: [{lvl: 1, name: "Eevee", img: "eevee", width: 45}, {lvl: 10, name: "Sylveon", img: "sylveon", width: 55}] },
             aurorus: { name: "AURORUS", speed: 7.2, glowColor: '#74b9ff', gif: 'https://play.pokemonshowdown.com/sprites/xyani/aurorus.gif', spriteWidth: 80, collisionRadius: 22, skills: { q: { name: "Rock Throw", cd: 4000 }, e: { name: "Frost Breath", cd: 5000 }, r: { name: "Meteor Beam", cd: 18000 } }, stats: { speed: 2, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Amaura", img: "amaura", width: 40}, {lvl: 10, name: "Aurorus", img: "aurorus", width: 80}] },
@@ -358,7 +343,7 @@
             { name: "Vulpix", baseHp: 700, speed: 3.6, baseDmg: 50, baseXp: 40, gif: 'https://play.pokemonshowdown.com/sprites/xyani/vulpix.gif', size: 40, aggroRange: 525 }, { name: "Slugma", baseHp: 900, speed: 1.2, baseDmg: 60, baseXp: 45, gif: 'https://play.pokemonshowdown.com/sprites/xyani/slugma.gif', size: 40, aggroRange: 300 }, { name: "Charmander", baseHp: 850, speed: 3.0, baseDmg: 70, baseXp: 50, gif: 'https://play.pokemonshowdown.com/sprites/xyani/charmander.gif', size: 45, aggroRange: 450 }, { name: "Numel", baseHp: 1500, speed: 1.8, baseDmg: 80, baseXp: 65, gif: 'https://play.pokemonshowdown.com/sprites/xyani/numel.gif', size: 55, aggroRange: 375 }, { name: "Magmar", baseHp: 2000, speed: 2.6, baseDmg: 100, baseXp: 90, gif: 'https://play.pokemonshowdown.com/sprites/xyani/magmar.gif', size: 60, aggroRange: 450 },
             { name: "Snorunt", baseHp: 800, speed: 2.4, baseDmg: 60, baseXp: 50, gif: 'https://play.pokemonshowdown.com/sprites/xyani/snorunt.gif', size: 40, aggroRange: 375 }, { name: "Spheal", baseHp: 1000, speed: 1.8, baseDmg: 50, baseXp: 55, gif: 'https://play.pokemonshowdown.com/sprites/xyani/spheal.gif', size: 45, aggroRange: 300 }, { name: "Cubchoo", baseHp: 1100, speed: 2.6, baseDmg: 70, baseXp: 60, gif: 'https://play.pokemonshowdown.com/sprites/xyani/cubchoo.gif', size: 45, aggroRange: 450 }, { name: "Seel", baseHp: 1300, speed: 3.0, baseDmg: 80, baseXp: 70, gif: 'https://play.pokemonshowdown.com/sprites/xyani/seel.gif', size: 55, aggroRange: 525 }, { name: "Snover", baseHp: 2200, speed: 2.1, baseDmg: 110, baseXp: 100, gif: 'https://play.pokemonshowdown.com/sprites/xyani/snover.gif', size: 60, aggroRange: 450 },
             { name: "Gastly", baseHp: 700, speed: 4.2, baseDmg: 80, baseXp: 60, gif: 'https://play.pokemonshowdown.com/sprites/xyani/gastly.gif', size: 40, aggroRange: 600 }, { name: "Shuppet", baseHp: 900, speed: 3.3, baseDmg: 75, baseXp: 65, gif: 'https://play.pokemonshowdown.com/sprites/xyani/shuppet.gif', size: 40, aggroRange: 525 }, { name: "Litwick", baseHp: 1000, speed: 2.4, baseDmg: 90, baseXp: 70, gif: 'https://play.pokemonshowdown.com/sprites/xyani/litwick.gif', size: 35, aggroRange: 450 }, { name: "Misdreavus", baseHp: 1400, speed: 3.0, baseDmg: 100, baseXp: 85, gif: 'https://play.pokemonshowdown.com/sprites/xyani/misdreavus.gif', size: 45, aggroRange: 450 }, { name: "Haunter", baseHp: 1800, speed: 3.6, baseDmg: 120, baseXp: 110, gif: 'https://play.pokemonshowdown.com/sprites/xyani/haunter.gif', size: 60, aggroRange: 600 },
-            { name: "Baltoy", baseHp: 1200, speed: 2.4, baseDmg: 80, baseXp: 70, gif: 'https://play.pokemonshowdown.com/sprites/xyani/baltoy.gif', size: 40, aggroRange: 450 }, { name: "Bronzor", baseHp: 1500, speed: 1.8, baseDmg: 70, baseXp: 75, gif: 'https://play.pokemonshowdown.com/sprites/xyani/bronzor.gif', size: 45, aggroRange: 375 }, { name: "Golett", baseHp: 1800, speed: 2.1, baseDmg: 110, baseXp: 90, gif: 'https://play.pokemonshowdown.com/sprites/xyani/golett.gif', size: 50, aggroRange: 450 }, { name: "Sigilyph", baseHp: 1600, speed: 3.8, baseDmg: 130, baseXp: 100, gif: 'https://play.pokemonshowdown.com/sprites/xyani/sigilyph.gif', size: 65, aggroRange: 600 }, { name: "Onix", baseHp: 3000, speed: 1.8, baseDmg: 150, baseXp: 150, gif: 'https://play.pokemonshowdown.com/sprites/xyani/onix.gif', size: 80, aggroRange: 525 }
+            { name: "Baltoy", baseHp: 1200, speed: 2.4, baseDmg: 80, baseXp: 70, gif: 'https://play.pokemonshowdown.com/sprites/xyani/baltoy.gif', size: 40, aggroRange: 450 }, { name: "Bronzor", baseHp: 1500, speed: 1.8, baseDmg: 70, baseXp: 75, gif: 'https://play.pokemonshowdown.com/sprites/xyani/bronzor.gif', size: 45, aggroRange: 375 }, { name: "Golett", baseHp: 1800, speed: 2.1, baseDmg: 110, baseXp: 90, gif: 'https://play.pokemonshowdown.com/sprites/xyani/golett.gif', size: 50, aggroRange: 450 }, { name: "Sigilyph", baseHp: 1600, speed: 3.8, baseDmg: 130, baseXp: 100, gif: 'https://play.pokemonshowdown.com/sprites/xyani/sigilyph.gif', size: 55, aggroRange: 600 }, { name: "Onix", baseHp: 3000, speed: 1.8, baseDmg: 150, baseXp: 150, gif: 'https://play.pokemonshowdown.com/sprites/xyani/onix.gif', size: 80, aggroRange: 525 }
         ];
 
         const trees = []; const mobs = []; const projectiles = []; const damageTexts = []; const visualEffects = []; const fruits = []; const expOrbs = []; const hitSparks = []; const powerups = []; const houses = []; let droppedItems = [];
@@ -502,9 +487,10 @@
             triggerScreenShake(30, 40);
             visualEffects.push({ x: player.x, y: player.y, type: 'evolution', life: 60 });
             
-            spriteEl.src = `https://play.pokemonshowdown.com/sprites/xyani/${pokemonDefs[player.currentPokemon].megaGif}.gif`;
-            spriteEl.style.width = (pokemonDefs[player.currentPokemon].spriteWidth * 1.5) + 'px';
-            document.getElementById('playerNameTag').innerText = "MEGA " + pokemonDefs[player.currentPokemon].name;
+            const def = pokemonDefs[player.currentPokemon];
+            spriteEl.src = `https://play.pokemonshowdown.com/sprites/xyani/${def.megaGif}.gif`;
+            spriteEl.style.width = ((def.megaSpriteWidth || def.spriteWidth) * 1.5) + 'px';
+            document.getElementById('playerNameTag').innerText = "MEGA " + def.name;
             
             if(player.currentPokemon === 'sceptile') {
                 document.getElementById('name-Q').innerText = "Dragon Pulse";
@@ -594,21 +580,21 @@
 
             player.buffs.shield = 3000;
 
-            // Generate Houses
+            // Generate Houses (400x400)
             for(let i=0; i<4; i++) {
                 let hx, hy, valid = false, attempts = 0;
                 while(!valid && attempts < 100) {
-                    hx = Math.random() * (WORLD_WIDTH - 1200) + 600;
-                    hy = Math.random() * (WORLD_HEIGHT - 1200) + 600;
-                    if(Math.hypot(hx - WORLD_WIDTH/2, hy - WORLD_HEIGHT/2) > 1000) {
+                    hx = Math.random() * (WORLD_WIDTH - 1000) + 500;
+                    hy = Math.random() * (WORLD_HEIGHT - 1000) + 500;
+                    if(Math.hypot(hx - WORLD_WIDTH/2, hy - WORLD_HEIGHT/2) > 800) {
                         valid = true;
-                        for(let h of houses) { if(Math.hypot(hx - h.x, hy - h.y) < 1800) valid = false; }
+                        for(let h of houses) { if(Math.hypot(hx - h.x, hy - h.y) < 1500) valid = false; }
                     }
                     attempts++;
                 }
                 houses.push({
-                    x: hx, y: hy, w: 600, h: 600,
-                    chests: [ {x: hx + 150, y: hy + 150, opened: false}, {x: hx + 450, y: hy + 150, opened: false} ]
+                    x: hx, y: hy, w: 400, h: 400,
+                    chests: [ {x: hx + 80, y: hy + 320, opened: false}, {x: hx + 320, y: hy + 320, opened: false} ]
                 });
             }
 
@@ -618,7 +604,7 @@
                 let inHouseArea = false;
                 for(let h of houses) { 
                     if (tx > h.x - 100 && tx < h.x + h.w + 100 && ty > h.y - 100 && ty < h.y + h.h + 150) { inHouseArea = true; break; } 
-                    if (tx > h.x + h.w/2 - 150 && tx < h.x + h.w/2 + 150 && ty >= h.y + h.h && ty < h.y + h.h + 400) { inHouseArea = true; break; }
+                    if (tx > h.x + h.w/2 - 80 && tx < h.x + h.w/2 + 80 && ty >= h.y + h.h && ty < h.y + h.h + 400) { inHouseArea = true; break; }
                 }
                 if (inHouseArea) { i--; continue; }
 
@@ -1480,12 +1466,28 @@
                         ctx.strokeStyle = '#271914'; ctx.lineWidth = 2;
                         for(let i=20; i<h.w; i+=40) { ctx.beginPath(); ctx.moveTo(h.x+i, h.y); ctx.lineTo(h.x+i, h.y+h.h); ctx.stroke(); } // Vân gỗ
                         
+                        // --- BẮT ĐẦU NỘI THẤT ---
+                        // Thảm
+                        ctx.fillStyle = 'rgba(192, 57, 43, 0.6)'; ctx.fillRect(h.x + h.w/2 - 60, h.y + h.h/2 - 50, 120, 100);
+                        ctx.strokeStyle = 'rgba(231, 76, 60, 0.4)'; ctx.strokeRect(h.x + h.w/2 - 60, h.y + h.h/2 - 50, 120, 100);
+                        // Giường ngủ (Góc trên trái)
+                        ctx.fillStyle = '#5d4037'; ctx.fillRect(h.x + 20, h.y + 20, 80, 110);
+                        ctx.fillStyle = '#bdc3c7'; ctx.fillRect(h.x + 25, h.y + 35, 70, 90);
+                        ctx.fillStyle = '#ecf0f1'; ctx.fillRect(h.x + 30, h.y + 25, 60, 20);
+                        // Bàn gỗ (Giữa nhà)
+                        ctx.fillStyle = '#795548'; ctx.beginPath(); ctx.arc(h.x + h.w/2, h.y + h.h/2, 30, 0, Math.PI*2); ctx.fill();
+                        ctx.fillStyle = '#4e342e'; ctx.beginPath(); ctx.arc(h.x + h.w/2, h.y + h.h/2, 20, 0, Math.PI*2); ctx.stroke();
+                        // Kệ tủ (Góc trên phải)
+                        ctx.fillStyle = '#4e342e'; ctx.fillRect(h.x + h.w - 90, h.y + 20, 70, 40);
+                        ctx.fillStyle = '#3e2723'; ctx.fillRect(h.x + h.w - 85, h.y + 25, 25, 30); ctx.fillRect(h.x + h.w - 55, h.y + 25, 25, 30);
+                        // --- KẾT THÚC NỘI THẤT ---
+
                         ctx.fillStyle = '#5d4037'; // Tường
                         ctx.fillRect(h.x, h.y, h.w, 20); // Top
                         ctx.fillRect(h.x, h.y, 20, h.h); // Left
                         ctx.fillRect(h.x + h.w - 20, h.y, 20, h.h); // Right
-                        ctx.fillRect(h.x, h.y + h.h - 20, h.w/2 - 100, 20); // Bottom left
-                        ctx.fillRect(h.x + h.w/2 + 100, h.y + h.h - 20, h.w/2 - 100, 20); // Bottom right
+                        ctx.fillRect(h.x, h.y + h.h - 20, h.w/2 - 60, 20); // Bottom left
+                        ctx.fillRect(h.x + h.w/2 + 60, h.y + h.h - 20, h.w/2 - 60, 20); // Bottom right
                         
                         for(let c of h.chests) {
                             ctx.save(); ctx.translate(c.x, c.y);
@@ -1508,7 +1510,8 @@
                     }
                 });
 
-                const currentCollisionRadius = pokemonDefs[player.currentPokemon].collisionRadius;
+                const def = pokemonDefs[player.currentPokemon];
+                const currentCollisionRadius = (player.isMega && def.megaCollisionRadius) ? def.megaCollisionRadius : def.collisionRadius;
                 ctx.beginPath(); ctx.ellipse(player.x, player.y + currentCollisionRadius, currentCollisionRadius*1.2, currentCollisionRadius*0.6, 0, 0, Math.PI*2); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
                 
                 if(player.buffs.shield > 0) {
