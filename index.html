@@ -120,9 +120,9 @@
         
         .skill-lock { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; z-index: 5; pointer-events: none; }
         
-        /* Nút Mega Evolution */
+        /* Nút Mega/Awaken Evolution */
         #megaBtnContainer { display: none; position: absolute; left: -70px; top: -20px; flex-direction: column; align-items: center; }
-        .mega-btn { width: 55px; height: 55px; background: radial-gradient(circle, #8e44ad, #2980b9); border-radius: 50%; border: 3px solid #f1c40f; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(142, 68, 173, 0.8), inset 0 0 10px rgba(0,0,0,0.8); animation: pulseMega 1s infinite alternate; pointer-events: auto;}
+        .mega-btn { width: 55px; height: 55px; background: radial-gradient(circle, #8e44ad, #2980b9); border-radius: 50%; border: 3px solid #f1c40f; display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 900; cursor: pointer; box-shadow: 0 0 15px rgba(142, 68, 173, 0.8), inset 0 0 10px rgba(0,0,0,0.8); animation: pulseMega 1s infinite alternate; pointer-events: auto;}
         .mega-btn:active { transform: scale(0.9); }
         .mega-key { position: absolute; top: -5px; left: -5px; background: #e74c3c; color: white; font-size: 10px; padding: 2px 5px; border-radius: 5px; border: 1px solid #fff; font-weight: 900; }
         @keyframes pulseMega { from { box-shadow: 0 0 10px rgba(142, 68, 173, 0.8); transform: scale(1); } to { box-shadow: 0 0 25px rgba(142, 68, 173, 1); transform: scale(1.05); } }
@@ -314,7 +314,7 @@
         const pokemonDefs = {
             pikachu: { name: "PIKACHU", speed: 8.5, glowColor: '#f1c40f', gif: 'https://play.pokemonshowdown.com/sprites/xyani/pikachu.gif', spriteWidth: 45, collisionRadius: 22, skills: { q: { name: "Electro Ball", cd: 3000 }, e: { name: "Volt Tackle", cd: 500 }, r: { name: "Thunderbolt", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Pichu", img: "pichu", width: 35}, {lvl: 10, name: "Pikachu", img: "pikachu", width: 45}] },
             cinderace: { name: "CINDERACE", speed: 8.2, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/cinderace.gif', spriteWidth: 28, collisionRadius: 18, skills: { q: { name: "Ember", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Pyro Ball", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 5 }, stages: [{lvl: 1, name: "Scorbunny", img: "scorbunny", width: 35}, {lvl: 5, name: "Raboot", img: "raboot", width: 45}, {lvl: 10, name: "Cinderace", img: "cinderace", width: 45}] },
-            greninja: { name: "GRENINJA", speed: 15.0, glowColor: '#3498db', gif: 'https://play.pokemonshowdown.com/sprites/xyani/greninja.gif', spriteWidth: 80, collisionRadius: 22, skills: { q: { name: "Water Pulse", cd: 3000 }, e: { name: "Dragon Cut", cd: 500 }, r: { name: "Water Shuriken", cd: 14000 } }, stats: { speed: 5, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Froakie", img: "froakie", width: 35}, {lvl: 5, name: "Frogadier", img: "frogadier", width: 45}, {lvl: 10, name: "Greninja", img: "greninja", width: 80}] },
+            greninja: { name: "GRENINJA", speed: 15.0, glowColor: '#3498db', gif: 'https://play.pokemonshowdown.com/sprites/xyani/greninja.gif', megaGif: 'greninja-ash', spriteWidth: 80, megaSpriteWidth: 40, collisionRadius: 22, megaCollisionRadius: 12, skills: { q: { name: "Water Pulse", cd: 3000 }, e: { name: "Dragon Cut", cd: 500 }, r: { name: "Water Shuriken", cd: 14000 } }, stats: { speed: 5, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Froakie", img: "froakie", width: 35}, {lvl: 5, name: "Frogadier", img: "frogadier", width: 45}, {lvl: 10, name: "Greninja", img: "greninja", width: 80}] },
             charizard: { name: "CHARIZARD", speed: 8.0, glowColor: '#d35400', gif: 'https://play.pokemonshowdown.com/sprites/xyani/charizard.gif', megaGif: 'charizard-megax', spriteWidth: 70, collisionRadius: 22, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Flamethrower", cd: 5000 }, r: { name: "Blast Burn", cd: 16000 } }, stats: { speed: 3, hp: 4, dmg: 5 }, stages: [{lvl: 1, name: "Charmander", img: "charmander", width: 35}, {lvl: 5, name: "Charmeleon", img: "charmeleon", width: 50}, {lvl: 10, name: "Charizard", img: "charizard", width: 70}] },
             venusaur: { name: "VENUSAUR", speed: 7.5, glowColor: '#27ae60', gif: 'https://play.pokemonshowdown.com/sprites/xyani/venusaur.gif', megaGif: 'venusaur-mega', spriteWidth: 80, collisionRadius: 25, skills: { q: { name: "Frenzy Plant", cd: 4000 }, e: { name: "Vine Whip", cd: 500 }, r: { name: "Solar Beam", cd: 15000 } }, stats: { speed: 3, hp: 5, dmg: 4 }, stages: [{lvl: 1, name: "Bulbasaur", img: "bulbasaur", width: 35}, {lvl: 5, name: "Ivysaur", img: "ivysaur", width: 60}, {lvl: 10, name: "Venusaur", img: "venusaur", width: 80}] },
             blastoise: { name: "BLASTOISE", speed: 7.8, glowColor: '#0984e3', gif: 'https://play.pokemonshowdown.com/sprites/xyani/blastoise.gif', megaGif: 'blastoise-mega', spriteWidth: 75, collisionRadius: 25, skills: { q: { name: "Hydro Pump", cd: 4000 }, e: { name: "Water Spout", cd: 500 }, r: { name: "Hydro Cannon", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Squirtle", img: "squirtle", width: 35}, {lvl: 5, name: "Wartortle", img: "wartortle", width: 50}, {lvl: 10, name: "Blastoise", img: "blastoise", width: 75}] },
@@ -483,8 +483,16 @@
             player.locks = { e: eLocked, r: rLocked };
 
             const megaBtnContainer = document.getElementById('megaBtnContainer');
+            const megaBtnText = megaBtnContainer.querySelector('.mega-btn');
             if (player.level >= 15 && def.megaGif) {
                 megaBtnContainer.style.display = 'flex';
+                if(player.currentPokemon === 'greninja') {
+                    megaBtnText.innerHTML = '<span class="mega-key">X</span>AWAKEN';
+                    megaBtnText.style.background = 'radial-gradient(circle, #2980b9, #000)'; 
+                } else {
+                    megaBtnText.innerHTML = '<span class="mega-key">X</span>MEGA';
+                    megaBtnText.style.background = 'radial-gradient(circle, #8e44ad, #2980b9)';
+                }
             } else {
                 megaBtnContainer.style.display = 'none';
             }
@@ -505,11 +513,17 @@
             const def = pokemonDefs[player.currentPokemon];
             spriteEl.src = `https://play.pokemonshowdown.com/sprites/xyani/${def.megaGif}.gif`;
             spriteEl.style.width = ((def.megaSpriteWidth || def.spriteWidth) * 1.5) + 'px';
-            document.getElementById('playerNameTag').innerText = "MEGA " + def.name;
-            
-            if(player.currentPokemon === 'sceptile') {
-                document.getElementById('name-Q').innerText = "Dragon Pulse";
-                document.getElementById('name-R').innerText = "Giga Drain";
+
+            if (player.currentPokemon === 'greninja') {
+                document.getElementById('playerNameTag').innerText = "ASH-GRENINJA";
+                document.getElementById('name-Q').innerText = "Aerial Ace";
+                document.getElementById('name-E').innerText = "Night Slash";
+            } else {
+                document.getElementById('playerNameTag').innerText = "MEGA " + def.name;
+                if(player.currentPokemon === 'sceptile') {
+                    document.getElementById('name-Q').innerText = "Dragon Pulse";
+                    document.getElementById('name-R').innerText = "Giga Drain";
+                }
             }
         }
 
@@ -527,6 +541,10 @@
                 if(player.currentPokemon === 'sceptile') {
                     document.getElementById('name-Q').innerText = def.skills.q.name;
                     document.getElementById('name-R').innerText = def.skills.r.name;
+                }
+                if(player.currentPokemon === 'greninja') {
+                    document.getElementById('name-Q').innerText = def.skills.q.name;
+                    document.getElementById('name-E').innerText = def.skills.e.name;
                 }
             }
 
@@ -943,6 +961,36 @@
                     document.getElementById('playerHpFill').style.width = Math.max(0, (player.hp / player.maxHp) * 100) + '%';
                 }
                 return;
+            } else if (player.currentPokemon === 'greninja') {
+                if (player.isMega) {
+                    // ASH GRENINJA SKILLS
+                    if (key === 'q') {
+                        startDash(angle, 55, 12, Math.round((500 + lvDmg) * dmgMultiplier));
+                        setTimeout(() => {
+                            visualEffects.push({ x: player.x + Math.cos(angle)*40, y: player.y + Math.sin(angle)*40, angle: angle, type: 'aerial_ace', life: 20 });
+                            dealAoEDamage(player.x + Math.cos(angle)*50, player.y + Math.sin(angle)*50, 150, Math.round((700 + lvDmg) * dmgMultiplier), false);
+                        }, 150);
+                    }
+                    if (key === 'e') {
+                        startDash(angle, 40, 12, Math.round((400 + lvDmg) * dmgMultiplier));
+                        setTimeout(() => { 
+                            visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'night_slash', life: 25 }); 
+                            dealAoEDamage(player.x + Math.cos(angle)*40, player.y + Math.sin(angle)*40, 180, Math.round((800 + lvDmg * 2) * dmgMultiplier), true);
+                        }, 150);
+                    }
+                    if (key === 'r') { 
+                        triggerScreenShake(15, 15); 
+                        fireProjectile(1, 22, 160, 'shuriken', Math.round((1400 + lvDmg * 4) * dmgMultiplier), 0, false, angle); 
+                    }
+                } else {
+                    if (key === 'q') fireProjectile(1, 18, 30, 'water', Math.round((350 + lvDmg) * dmgMultiplier), 0, false, angle); 
+                    if (key === 'e') { 
+                        startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier)); 
+                        setTimeout(() => { visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'cut', life: 25 }); dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 150, Math.round((600 + lvDmg) * dmgMultiplier), false); }, 150); 
+                    }
+                    if (key === 'r') { triggerScreenShake(10, 10); fireProjectile(1, 20, 120, 'shuriken', Math.round((1400 + lvDmg * 4) * dmgMultiplier), 0, false, angle); }
+                }
+                return;
             }
 
             if (player.currentPokemon === 'pikachu') {
@@ -953,13 +1001,6 @@
                 if (key === 'q') fireProjectile(1, 16, 25, 'fire', Math.round((350 + lvDmg) * dmgMultiplier), 0, false, angle); 
                 if (key === 'e') { startDash(angle, 40, 15, Math.round((300 + lvDmg) * dmgMultiplier)); setTimeout(() => { visualEffects.push({ x: player.x, y: player.y, type: 'explosion', life: 20 }); dealAoEDamage(player.x, player.y, 150, Math.round((450 + lvDmg) * dmgMultiplier), false); }, 250); } 
                 if (key === 'r') { triggerScreenShake(15, 15); fireProjectile(1, 14, 100, 'fire', Math.round((1500 + lvDmg * 4) * dmgMultiplier), 0, false, angle); }
-            } else if (player.currentPokemon === 'greninja') {
-                if (key === 'q') fireProjectile(1, 18, 30, 'water', Math.round((350 + lvDmg) * dmgMultiplier), 0, false, angle); 
-                if (key === 'e') { 
-                    startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier)); 
-                    setTimeout(() => { visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'cut', life: 25 }); dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 150, Math.round((600 + lvDmg) * dmgMultiplier), false); }, 150); 
-                }
-                if (key === 'r') { triggerScreenShake(10, 10); fireProjectile(1, 20, 120, 'shuriken', Math.round((1400 + lvDmg * 4) * dmgMultiplier), 0, false, angle); }
             } else if (player.currentPokemon === 'charizard') {
                 if (key === 'q') fireProjectile(3, 16, 35, 'fire_claw', Math.round((380 + lvDmg) * dmgMultiplier), 0.2, false, angle); 
                 if (key === 'e') { for(let f=0; f<8; f++) { setTimeout(() => fireProjectile(1, 15, 30, 'fire', Math.round((150 + lvDmg*0.5) * dmgMultiplier), 0, false, angle + (Math.random()*0.2-0.1)), f*50); } }
@@ -980,21 +1021,6 @@
                 if (key === 'q') fireProjectile(3, 14, 30, 'rock_throw', Math.round((350 + lvDmg) * dmgMultiplier), 0.25, false, angle);
                 if (key === 'e') { for(let f=0; f<10; f++) { setTimeout(() => fireProjectile(1, 12, 40, 'frost', Math.round((200 + lvDmg*0.5) * dmgMultiplier), 0, false, angle + (Math.random()*0.4-0.2)), f*40); } }
                 if (key === 'r') { triggerScreenShake(30, 40); visualEffects.push({ x: targetX, y: targetY, type: 'meteor_beam', life: 40 }); setTimeout(() => dealAoEDamage(targetX, targetY, 250, Math.round((2500 + lvDmg * 5) * dmgMultiplier), false), 300); }
-            } else if (player.currentPokemon === 'sceptile') {
-                if (key === 'q') fireProjectile(1, 16, 40, 'energy_ball', Math.round((350 + lvDmg) * dmgMultiplier), 0, false, angle);
-                if (key === 'e') {
-                    startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
-                    setTimeout(() => {
-                        visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'leaf_blade', life: 25 });
-                        dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
-                    }, 150);
-                }
-                if (key === 'r') {
-                    triggerScreenShake(20, 20);
-                    for(let f=0; f<15; f++) {
-                        setTimeout(() => fireProjectile(1, 14, 45, 'leaf', Math.round((180 + lvDmg*0.5) * dmgMultiplier), 0, false, angle + (Math.random()*0.8-0.4)), f*40);
-                    }
-                }
             } else if (player.currentPokemon === 'blaziken') {
                 if (key === 'q') {
                     startDash(angle, 40, 15, Math.round((450 + lvDmg) * dmgMultiplier));
@@ -1103,7 +1129,7 @@
                 }
                 if (key === 'r') {
                     triggerScreenShake(35, 25);
-                    visualEffects.push({ x: player.x, y: player.y, type: 'water_pulse', life: 20 }); 
+                    visualEffects.push({ x: player.x, y: player.y, type: 'water_pulse', life: 20 }); 
                     fireProjectile(1, 30, 90, 'hydro_cannon', Math.round((2500 + lvDmg * 5) * dmgMultiplier), 0, false, angle);
                 }
             } else if (player.currentPokemon === 'garchomp') {
@@ -1141,7 +1167,6 @@
                 }
                 if (key === 'r') {
                     triggerScreenShake(20, 20);
-                    // Bắn 2 con rồng cùng lúc, giảm lag. Sát thương nhân 6 mỗi con để bù lại (tổng dmg = 12 mũi tên cũ).
                     fireProjectile(2, 25, 25, 'dragon_dart', Math.round((2400 + lvDmg * 6) * dmgMultiplier), 0.2, false, angle);
                 }
             }
@@ -1149,7 +1174,7 @@
 
         function fireProjectile(count, speed, size, type, damage, spreadAngle = 0, isEnemy = false, fixedAngle = null) {
             let angleBase = fixedAngle !== null ? fixedAngle : Math.atan2(mouseY + camera.y - player.y, mouseX + camera.x - player.x);
-            if(isMobile && fixedAngle === null && !isEnemy) angleBase = getAutoAimAngle(); 
+            if(isMobile && fixedAngle === null && !isEnemy) angleBase = getAutoAimAngle(); 
             
             let originX = isEnemy ? mewtwoBoss.x : player.x; let originY = isEnemy ? mewtwoBoss.y : player.y;
             for (let i = 0; i < count; i++) {
@@ -1169,32 +1194,32 @@
             damageTexts.push({ x: mob.x + (Math.random()*40-20), y: mob.y - 40, text: amount + txtAdd, life: 40, color: txtColor, size: txtSize });
             spawnHitSparks(mob.x, mob.y, txtColor);
             
-            if (mob.isBoss) { document.getElementById('bossHpFill').style.width = Math.max(0, (mob.hp / mob.maxHp) * 100) + '%'; } 
+            if (mob.isBoss) { document.getElementById('bossHpFill').style.width = Math.max(0, (mob.hp / mob.maxHp) * 100) + '%'; } 
             else { const hpBar = document.getElementById(`hp-${mob.id}`); if (hpBar) hpBar.style.width = Math.max(0, (mob.hp / mob.maxHp) * 100) + '%'; }
             
-            if(mob.imgElement) { 
+            if(mob.imgElement) { 
                 mob.isFlashing = true;
-                mob.imgElement.style.filter = 'brightness(3) sepia(1) hue-rotate(-50deg) saturate(5)'; 
-                setTimeout(() => { if (mob.imgElement) { mob.imgElement.style.filter = 'none'; mob.isFlashing = false;} }, 120); 
+                mob.imgElement.style.filter = 'brightness(3) sepia(1) hue-rotate(-50deg) saturate(5)'; 
+                setTimeout(() => { if (mob.imgElement) { mob.imgElement.style.filter = 'none'; mob.isFlashing = false;} }, 120); 
             }
             
-            if (mob.hp <= 0) { 
-                mob.isDead = true; mob.element.style.display = 'none'; 
-                if (mob.isBoss) { setTimeout(() => { alert("CONGRATULATIONS! YOU DEFEATED MEWTWO AND CLEARED THE GAME!"); handleDeath(); }, 500); } 
-                else { 
+            if (mob.hp <= 0) { 
+                mob.isDead = true; mob.element.style.display = 'none'; 
+                if (mob.isBoss) { setTimeout(() => { alert("CONGRATULATIONS! YOU DEFEATED MEWTWO AND CLEARED THE GAME!"); handleDeath(); }, 500); } 
+                else { 
                     comboCount++; comboTimer = MAX_COMBO_TIMER; updateComboUI();
-                    spawnExpOrb(mob.x, mob.y, mob.xpReward); 
+                    spawnExpOrb(mob.x, mob.y, mob.xpReward); 
                     if(mob.isElite && Math.random() < 0.5) spawnPowerup(mob.x, mob.y);
-                    setTimeout(spawnMob, 1000); 
+                    setTimeout(spawnMob, 1000); 
                 }
             }
         }
 
         function takePlayerDamage(amount) {
-            if (!isPlaying || player.buffs.shield > 0 || player.inHouseFlag) return; 
+            if (!isPlaying || player.buffs.shield > 0 || player.inHouseFlag) return; 
             if (player.dashTime > 0) return;
 
-            player.hp -= amount; audioSystem.playSFX('hit'); triggerScreenShake(8, 8); 
+            player.hp -= amount; audioSystem.playSFX('hit'); triggerScreenShake(8, 8); 
             damageTexts.push({ x: player.x + (Math.random()*40-20), y: player.y - 50, text: amount, life: 35, color: '#9b59b6', size: 30 });
             document.getElementById('playerHpFill').style.width = Math.max(0, (player.hp / player.maxHp) * 100) + '%';
             spriteEl.style.filter = 'brightness(3) saturate(5) hue-rotate(300deg)'; setTimeout(() => { spriteEl.style.filter = 'drop-shadow(0px 15px 10px rgba(0,0,0,0.8))'; }, 150);
@@ -1206,16 +1231,16 @@
             if(player.buffs.xpDouble > 0) amount *= 2;
             player.xp += amount; audioSystem.playSFX('pickup');
             if (player.xp >= player.maxXp) {
-                audioSystem.playSFX('levelup'); player.level++; player.xp -= player.maxXp; player.maxXp = Math.floor(player.maxXp * 1.5); player.maxHp = Math.round(player.maxHp * 1.15); player.hp = Math.min(player.maxHp, player.hp + player.maxHp * 0.2); 
-                player.upgradePoints++; checkEvolution(); updateUpgradeUI(); 
+                audioSystem.playSFX('levelup'); player.level++; player.xp -= player.maxXp; player.maxXp = Math.floor(player.maxXp * 1.5); player.maxHp = Math.round(player.maxHp * 1.15); player.hp = Math.min(player.maxHp, player.hp + player.maxHp * 0.2); 
+                player.upgradePoints++; checkEvolution(); updateUpgradeUI(); 
                 
                 let displayLevel = player.level >= 35 ? 'MAX' : player.level;
-                document.getElementById('levelText').innerText = displayLevel === 'MAX' ? 'LV. MAX' : `LV. ${displayLevel}`; 
+                document.getElementById('levelText').innerText = displayLevel === 'MAX' ? 'LV. MAX' : `LV. ${displayLevel}`; 
                 document.getElementById('playerHpFill').style.width = Math.max(0, (player.hp / player.maxHp) * 100) + '%';
                 
-                if (player.level > highestLevelReached) { 
-                    highestLevelReached = player.level; 
-                    if(document.getElementById('inGameMapModal').style.display === 'block') { renderInGameMapList(); } 
+                if (player.level > highestLevelReached) { 
+                    highestLevelReached = player.level; 
+                    if(document.getElementById('inGameMapModal').style.display === 'block') { renderInGameMapList(); } 
                 }
                 const lvlUpText = document.createElement('div'); lvlUpText.className = 'level-up-text';
                 lvlUpText.innerHTML = `LEVEL UP!<br><span style="font-size: 20px; color:#2ecc71;">+1 SKILL | +HP | +DAMAGE</span>`;
@@ -1226,8 +1251,8 @@
             document.getElementById('xpBarFill').style.width = (player.xp / player.maxXp * 100) + '%';
         }
 
-        function gameLoop() { 
-            if (!isPlaying) return; 
+        function gameLoop() { 
+            if (!isPlaying) return; 
             try { update(); if (isPlaying) { draw(); } } catch(e) { console.error("Game Loop Crashed:", e); isPlaying = false; }
             if (isPlaying) { animationId = requestAnimationFrame(gameLoop); }
         }
@@ -1235,7 +1260,7 @@
         function update() {
             const now = Date.now(); const dt = now - lastTime; lastTime = now;
 
-            timeOfDay++; if(timeOfDay > DAY_LENGTH * 2) timeOfDay = 0; globalDarkAlpha = 0; 
+            timeOfDay++; if(timeOfDay > DAY_LENGTH * 2) timeOfDay = 0; globalDarkAlpha = 0; 
             if(timeOfDay > DAY_LENGTH) { let nightProg = (timeOfDay - DAY_LENGTH) / DAY_LENGTH; globalDarkAlpha = Math.sin(nightProg * Math.PI) * 0.7; }
             document.getElementById('dayNightOverlay').style.backgroundColor = `rgba(5, 5, 20, ${globalDarkAlpha})`;
             if(screenShakeTime > 0) { screenShakeTime--; }
@@ -1789,6 +1814,24 @@
                             ctx.fillStyle = v.color || '#fff'; ctx.fill(); 
                             ctx.globalAlpha = 1.0;
                         }
+                        else if (v.type === 'aerial_ace') {
+                            ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle);
+                            ctx.beginPath(); ctx.moveTo(0, -100); ctx.lineTo(150, 100);
+                            ctx.moveTo(0, 100); ctx.lineTo(150, -100);
+                            ctx.strokeStyle = `rgba(236, 240, 241, ${v.life/20})`;
+                            ctx.lineWidth = 15; ctx.lineCap = 'round'; ctx.stroke();
+                            ctx.restore();
+                        }
+                        else if (v.type === 'night_slash') { 
+                            ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); 
+                            ctx.beginPath(); ctx.arc(0, 0, 160, -Math.PI/2, Math.PI/2); 
+                            ctx.strokeStyle = `rgba(0, 0, 0, ${v.life/25})`; 
+                            ctx.lineWidth = 40; ctx.lineCap = 'round'; ctx.stroke(); 
+                            ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/3, Math.PI/3); 
+                            ctx.strokeStyle = `rgba(142, 68, 173, ${v.life/25})`; 
+                            ctx.lineWidth = 15; ctx.stroke(); 
+                            ctx.restore(); 
+                        }
                         else if (v.type === 'iron_tail') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2, Math.PI/2); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(189, 195, 199, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'fire_kick') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 100 + (15-v.life)*2, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = `rgba(231, 76, 60, ${v.life/15})`; ctx.lineWidth = 35; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 70 + (15-v.life), -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(241, 196, 15, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'basic_cut') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(52, 152, 219, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
@@ -1806,7 +1849,7 @@
                         else if (v.type === 'blaze_kick_explosion') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(211, 84, 0, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(-Math.PI/4); ctx.fillStyle = `rgba(231, 76, 60, ${v.life/35})`; ctx.fillRect(-40, -150, 80, 300); ctx.restore(); }
                         else if (v.type === 'sun_slash') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(243, 156, 18, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'psychic_fangs') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(120, 0); ctx.lineTo(0, 80); ctx.strokeStyle = `rgba(155, 89, 182, ${v.life/25})`; ctx.lineWidth = 30; ctx.lineJoin = 'miter'; ctx.stroke(); ctx.beginPath(); ctx.moveTo(20, -60); ctx.lineTo(100, 0); ctx.lineTo(20, 60); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/25})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
-                        else if (v.type === 'sunsteel_charge') { ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(243, 156, 18, ${v.life/20})`; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#f1c40f'; ctx.stroke(); }
+                        else if (v.type === 'sunsteel_charge') { ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba243, 156, 18, ${v.life/20})`; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#f1c40f'; ctx.stroke(); }
                         else if (v.type === 'sunsteel_blast') { ctx.beginPath(); ctx.arc(v.x, v.y, 400 - v.life*6, 0, Math.PI*2); ctx.fillStyle = `rgba(243, 156, 18, ${v.life/40})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(255, 255, 255, ${v.life/40})`; ctx.fill(); ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.life * 0.1); for(let j=0; j<8; j++) { ctx.rotate(Math.PI/4); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/40})`; ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, 0); ctx.lineTo(0, 300); ctx.fill(); } ctx.restore(); }
                         else if (v.type === 'close_combat') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/25})`; for(let j=0; j<5; j++) { ctx.beginPath(); ctx.ellipse((Math.random()-0.5)*100, (Math.random()-0.5)*100, 40, 10, 0, 0, Math.PI*2); ctx.fill(); } ctx.restore(); }
                         else if (v.type === 'meteor_assault') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(230, 126, 34, ${v.life/35})`; ctx.fill(); ctx.lineWidth = 15; ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/35})`; ctx.stroke(); }
