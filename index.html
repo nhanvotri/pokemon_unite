@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pokemon Unite - Ultimate Awakened Engine V8</title>
     <style>
+        /* ==========================================================================
+           [1] CSS RESET & BASE LAYOUT
+           ========================================================================== */
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
         body { overflow: hidden; background-color: #050505; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white; user-select: none; -webkit-user-select: none; }
         
@@ -13,6 +16,9 @@
         #dayNightOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; background-color: rgba(0, 0, 30, 0); transition: background-color 5s linear; }
         #bloodVignette { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; background: radial-gradient(circle at center, transparent 40%, rgba(255, 0, 0, 0.4) 100%); opacity: 0; transition: opacity 0.2s; }
         
+        /* ==========================================================================
+           [2] MAIN MENU UI
+           ========================================================================== */
         #startMenu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e272e 0%, #000000 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
         #startMenu h1 { font-size: 65px; color: #f1c40f; text-align: center; text-shadow: 0 15px 40px rgba(241,196,15,0.4), 0 0 15px rgba(255,255,255,0.2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 8px; font-weight: 900; }
         @media (max-width: 768px) { #startMenu h1 { font-size: 40px; letter-spacing: 4px;} }
@@ -38,6 +44,7 @@
         .menuBtn:hover { transform: translateY(-3px); background: #34495e; border-color: #bdc3c7;}
         .menuBtn.active { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 25px rgba(255,255,255,0.4); border-width: 3px;}
         
+        /* Màu gradient riêng theo từng hệ của Pokémon */
         #menuBtnPikachu.active { background: linear-gradient(135deg, #f39c12, #f1c40f); color: #000; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5);} 
         #menuBtnCinderace.active { background: linear-gradient(135deg, #d35400, #e74c3c); box-shadow: 0 5px 20px rgba(231, 76, 60, 0.5);} 
         #menuBtnGreninja.active { background: linear-gradient(135deg, #2980b9, #3498db); box-shadow: 0 5px 20px rgba(52, 152, 219, 0.5);}
@@ -64,6 +71,9 @@
         #btnStartGame:hover { transform: scale(1.05) translateY(-3px); background: linear-gradient(45deg, #f39c12, #f1c40f); box-shadow: 0 15px 40px rgba(241, 196, 15, 0.6); color: #000; }
         @keyframes pulsePlay { 0% { box-shadow: 0 0 10px rgba(46, 204, 113, 0.4); transform: scale(1); } 100% { box-shadow: 0 0 30px rgba(46, 204, 113, 0.8); transform: scale(1.02); } }
 
+        /* ==========================================================================
+           [3] IN-GAME UI
+           ========================================================================== */
         #inGameMapBtn { position: absolute; top: 15px; left: 15px; z-index: 50; background: rgba(41, 128, 185, 0.5); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 8px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.3s; backdrop-filter: blur(5px); text-transform: uppercase; }
         #inGameMapBtn:hover { transform: scale(1.05); background: rgba(52, 152, 219, 0.8); border-color: #fff;}
         .mapSelectionContainer { background: rgba(15, 15, 20, 0.95); padding: 30px; border-radius: 15px; text-align: center; border: 2px solid rgba(255,255,255,0.1); width: 80%; max-width: 700px; box-shadow: 0 20px 60px rgba(0,0,0,1); backdrop-filter: blur(15px); }
@@ -306,10 +316,10 @@
             dragonite: { name: "DRAGONITE", speed: 7.8, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/dragonite.gif', spriteWidth: 65, collisionRadius: 22, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Dragon Breath", cd: 5000 }, r: { name: "Draco Meteor", cd: 18000 } }, stats: { speed: 3, hp: 5, dmg: 4 }, stages: [{lvl: 1, name: "Dratini", img: "dratini", width: 35}, {lvl: 5, name: "Dragonair", img: "dragonair", width: 55}, {lvl: 10, name: "Dragonite", img: "dragonite", width: 65}] },
             garchomp: { name: "GARCHOMP", speed: 8.5, glowColor: '#9b59b6', gif: 'https://play.pokemonshowdown.com/sprites/xyani/garchomp.gif', megaGif: 'garchomp-mega', spriteWidth: 75, collisionRadius: 25, skills: { q: { name: "Earthquake", cd: 4000 }, e: { name: "Dragon Claw", cd: 500 }, r: { name: "Dragon Rush", cd: 15000 } }, stats: { speed: 4, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Gible", img: "gible", width: 35}, {lvl: 5, name: "Gabite", img: "gabite", width: 55}, {lvl: 10, name: "Garchomp", img: "garchomp", width: 75}] },
             dragapult: { name: "DRAGAPULT", speed: 10.0, glowColor: '#9b59b6', gif: 'https://play.pokemonshowdown.com/sprites/xyani/dragapult.gif', spriteWidth: 70, collisionRadius: 22, skills: { q: { name: "Shadow Ball", cd: 3000 }, e: { name: "Breaking Swipe", cd: 4000 }, r: { name: "Dragon Darts", cd: 13000 } }, stats: { speed: 5, hp: 3, dmg: 5 }, stages: [{lvl: 1, name: "Dreepy", img: "dreepy", width: 30}, {lvl: 5, name: "Drakloak", img: "drakloak", width: 50}, {lvl: 10, name: "Dragapult", img: "dragapult", width: 70}] },
-            lucario: { name: "LUCARIO", speed: 9.0, glowColor: '#2980b9', gif: 'https://play.pokemonshowdown.com/sprites/xyani/lucario.gif', megaGif: 'lucario-mega', spriteWidth: 50, collisionRadius: 22, skills: { q: { name: "Counter", cd: 4000 }, e: { name: "Force Palm", cd: 500 }, r: { name: "Aura Sphere", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Riolu", img: "riolu", width: 35}, {lvl: 10, name: "Lucario", img: "lucario", width: 50}] },
+            lucario: { name: "LUCARIO", speed: 9.0, glowColor: '#2980b9', gif: 'https://play.pokemonshowdown.com/sprites/xyani/lucario.gif', megaGif: 'lucario-mega', megaSpriteWidth: 40, megaCollisionRadius: 18, spriteWidth: 50, collisionRadius: 22, skills: { q: { name: "Counter", cd: 4000 }, e: { name: "Force Palm", cd: 500 }, r: { name: "Aura Sphere", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Riolu", img: "riolu", width: 35}, {lvl: 10, name: "Lucario", img: "lucario", width: 50}] },
             sylveon: { name: "SYLVEON", speed: 8.8, glowColor: '#fd79a8', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sylveon.gif', spriteWidth: 55, collisionRadius: 22, skills: { q: { name: "Shadow Ball", cd: 3000 }, e: { name: "Fairy Wind", cd: 500 }, r: { name: "Moonblast", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 4 }, stages: [{lvl: 1, name: "Eevee", img: "eevee", width: 45}, {lvl: 10, name: "Sylveon", img: "sylveon", width: 55}] },
             aurorus: { name: "AURORUS", speed: 7.2, glowColor: '#74b9ff', gif: 'https://play.pokemonshowdown.com/sprites/xyani/aurorus.gif', spriteWidth: 80, collisionRadius: 22, skills: { q: { name: "Rock Throw", cd: 4000 }, e: { name: "Frost Breath", cd: 5000 }, r: { name: "Meteor Beam", cd: 18000 } }, stats: { speed: 2, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Amaura", img: "amaura", width: 40}, {lvl: 10, name: "Aurorus", img: "aurorus", width: 80}] },
-            sceptile: { name: "SCEPTILE", speed: 14.0, glowColor: '#2ecc71', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sceptile.gif', megaGif: 'sceptile-mega', spriteWidth: 60, collisionRadius: 22, skills: { q: { name: "Energy Ball", cd: 3500 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Leaf Storm", cd: 14000 } }, stats: { speed: 5, hp: 3, dmg: 4 }, stages: [{lvl: 1, name: "Treecko", img: "treecko", width: 35}, {lvl: 5, name: "Grovyle", img: "grovyle", width: 60}, {lvl: 10, name: "Sceptile", img: "sceptile", width: 60}] },
+            sceptile: { name: "SCEPTILE", speed: 14.0, glowColor: '#2ecc71', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sceptile.gif', megaGif: 'sceptile-mega', spriteWidth: 60, megaSpriteWidth: 50, collisionRadius: 22, megaCollisionRadius: 18, skills: { q: { name: "Energy Ball", cd: 3500 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Leaf Storm", cd: 14000 } }, stats: { speed: 5, hp: 3, dmg: 4 }, stages: [{lvl: 1, name: "Treecko", img: "treecko", width: 35}, {lvl: 5, name: "Grovyle", img: "grovyle", width: 60}, {lvl: 10, name: "Sceptile", img: "sceptile", width: 60}] },
             blaziken: { name: "BLAZIKEN", speed: 8.5, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/blaziken.gif', megaGif: 'blaziken-mega', spriteWidth: 55, collisionRadius: 22, skills: { q: { name: "Flare Blitz", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Blaze Kick", cd: 13000 } }, stats: { speed: 4, hp: 3, dmg: 5 }, stages: [{lvl: 1, name: "Torchic", img: "torchic", width: 30}, {lvl: 5, name: "Combusken", img: "combusken", width: 60}, {lvl: 10, name: "Blaziken", img: "blaziken", width: 55}] },
             solgaleo: { name: "SOLGALEO", speed: 8.0, glowColor: '#f39c12', gif: 'https://play.pokemonshowdown.com/sprites/xyani/solgaleo.gif', spriteWidth: 100, collisionRadius: 22, skills: { q: { name: "Solar Beam", cd: 5000 }, e: { name: "Psychic Fangs", cd: 600 }, r: { name: "Sunsteel Strike", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Cosmog", img: "cosmog", width: 60}, {lvl: 5, name: "Cosmoem", img: "cosmoem", width: 40}, {lvl: 10, name: "Solgaleo", img: "solgaleo", width: 100}] },
             sirfetchd: { name: "SIRFETCH'D", speed: 8.2, glowColor: '#27ae60', gif: 'https://play.pokemonshowdown.com/sprites/xyani/sirfetchd.gif', spriteWidth: 60, collisionRadius: 22, skills: { q: { name: "Close Combat", cd: 4000 }, e: { name: "Leaf Blade", cd: 500 }, r: { name: "Meteor Assault", cd: 15000 } }, stats: { speed: 3, hp: 4, dmg: 5 }, stages: [{lvl: 1, name: "Farfetch'd", img: "farfetchd", width: 40}, {lvl: 10, name: "Sirfetch'd", img: "sirfetchd", width: 60}] },
@@ -620,7 +630,21 @@
             } else { 
                 document.getElementById('bossUiContainer').style.display = 'none'; 
                 document.getElementById('inGameMapBtn').style.display = 'block';
-                for (let i = 0; i < 150; i++) { spawnMob(); } 
+                for (let i = 0; i < 150; i++) {
+                    let mx, my, validSpawn = false, maxAttempts = 50;
+                    while(!validSpawn && maxAttempts > 0) {
+                        mx = Math.random() * (WORLD_WIDTH - 200) + 100;
+                        my = Math.random() * (WORLD_HEIGHT - 200) + 100;
+                        validSpawn = true;
+                        for(let h of houses) {
+                            if (mx > h.x - 50 && mx < h.x + h.w + 50 && my > h.y - 50 && my < h.y + h.h + 50) {
+                                validSpawn = false; break;
+                            }
+                        }
+                        maxAttempts--;
+                    }
+                    spawnMob(mx, my); 
+                } 
             }
             
             closeMapModal();
@@ -652,7 +676,7 @@
             for (let i = 0; i < count; i++) { weatherParticles.push({ x: Math.random() * WORLD_WIDTH, y: Math.random() * WORLD_HEIGHT, size: Math.random() * 4 + 1, speedX: (Math.random() - 0.5) * 2, speedY: Math.random() * 2 + 1, type: type, opacity: Math.random() * 0.5 + 0.3 }); }
         }
 
-        function spawnMob() {
+        function spawnMob(fixedX, fixedY) {
             if (!isPlaying || mapsData.find(m => m.id === selectedMapId).isBoss) return;
             const currentMap = mapsData.find(m => m.id === selectedMapId); 
             const allowedMobs = mobTypes.filter(m => currentMap.mobs.includes(m.name)); 
@@ -665,10 +689,25 @@
             let mobLvl = Math.floor(Math.random() * (maxLvl - minLvl + 1)) + minLvl;
             
             let isElite = Math.random() < 0.1;
+            
+            let mx = fixedX, my = fixedY;
+            if (mx === undefined || my === undefined) {
+                let validSpawn = false;
+                while(!validSpawn) {
+                    mx = Math.random() * (WORLD_WIDTH - 200) + 100;
+                    my = Math.random() * (WORLD_HEIGHT - 200) + 100;
+                    validSpawn = true;
+                    for(let h of houses) {
+                        if (mx > h.x - 50 && mx < h.x + h.w + 50 && my > h.y - 50 && my < h.y + h.h + 50) {
+                            validSpawn = false; break;
+                        }
+                    }
+                }
+            }
+
             const mob = {
                 id: Math.random().toString(), 
-                x: Math.random() * (WORLD_WIDTH - 200) + 100, 
-                y: Math.random() * (WORLD_HEIGHT - 200) + 100,
+                x: mx, y: my,
                 level: mobLvl, 
                 maxHp: type.baseHp + (mobLvl * type.baseHp * 0.2) * (isElite ? 3 : 1), 
                 hp: type.baseHp + (mobLvl * type.baseHp * 0.2) * (isElite ? 3 : 1), 
@@ -1384,6 +1423,19 @@
                     }
                 }
 
+                // Mob House Collision
+                for (let h of houses) {
+                    let mR = mob.radius;
+                    if (mob.x + mR > h.x && mob.x - mR < h.x + 20 && mob.y > h.y && mob.y < h.y + h.h) { mob.x = mob.x < h.x ? h.x - mR : h.x + 20 + mR; }
+                    if (mob.x + mR > h.x + h.w - 20 && mob.x - mR < h.x + h.w && mob.y > h.y && mob.y < h.y + h.h) { mob.x = mob.x < h.x + h.w - 20 ? h.x + h.w - 20 - mR : h.x + h.w + mR; }
+                    if (mob.y + mR > h.y && mob.y - mR < h.y + 20 && mob.x > h.x && mob.x < h.x + h.w) { mob.y = mob.y < h.y ? h.y - mR : h.y + 20 + mR; }
+                    if (mob.y + mR > h.y + h.h - 20 && mob.y - mR < h.y + h.h && mob.x > h.x && mob.x < h.x + h.w) {
+                        if (mob.x < h.x + h.w/2 - 100 || mob.x > h.x + h.w/2 + 100) { 
+                            mob.y = mob.y < h.y + h.h - 20 ? h.y + h.h - 20 - mR : h.y + h.h + mR;
+                        }
+                    }
+                }
+
                 let mRes = mob;
                 for (let t of trees) {
                     const dist = Math.hypot(mRes.x - t.x, mRes.y - t.y);
@@ -1685,7 +1737,12 @@
                         else if (v.type === 'blast_burn') { ctx.beginPath(); ctx.arc(v.x, v.y, 300 - v.life*5, 0, Math.PI*2); ctx.fillStyle = `rgba(211, 84, 0, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 200 - v.life*3, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); }
                         else if (v.type === 'meteor') { ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(230, 126, 34, ${v.life/30})`; ctx.fill(); }
                         else if (v.type === 'aura_blast') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(52, 152, 219, ${v.life/25})`; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#fff'; ctx.stroke(); }
-                        else if (v.type === 'trail') { ctx.beginPath(); ctx.arc(v.x, v.y, pokemonDefs[player.currentPokemon].collisionRadius, 0, Math.PI*2); ctx.fillStyle = `rgba(52, 152, 219, ${v.life/15})`; ctx.fill(); }
+                        else if (v.type === 'trail') { 
+                            ctx.globalAlpha = Math.max(0, v.life/15);
+                            ctx.beginPath(); ctx.arc(v.x, v.y, pokemonDefs[player.currentPokemon].collisionRadius, 0, Math.PI*2); 
+                            ctx.fillStyle = pokemonDefs[player.currentPokemon].glowColor; ctx.fill(); 
+                            ctx.globalAlpha = 1.0;
+                        }
                         else if (v.type === 'iron_tail') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2, Math.PI/2); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(189, 195, 199, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'fire_kick') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 100 + (15-v.life)*2, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = `rgba(231, 76, 60, ${v.life/15})`; ctx.lineWidth = 35; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 70 + (15-v.life), -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(241, 196, 15, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'basic_cut') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(52, 152, 219, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
@@ -1698,7 +1755,7 @@
                         else if (v.type === 'meteor_beam') { ctx.fillStyle = `rgba(116, 185, 255, ${v.life/40})`; ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*2, 0, Math.PI*2); ctx.fill(); ctx.fillStyle = `rgba(255, 255, 255, ${v.life/40})`; ctx.fillRect(v.x - (100 - v.life*1.5), v.y - 1500, (100 - v.life*1.5)*2, 1500); ctx.fillStyle = `rgba(178, 190, 195, ${v.life/40})`; for(let j=0; j<5; j++) { ctx.beginPath(); ctx.arc(v.x + Math.sin(v.life+j)*100, v.y - (40-v.life)*10 + j*20, 15, 0, Math.PI*2); ctx.fill(); } }
                         else if (v.type === 'ice_smash') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = `rgba(116, 185, 255, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 100, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'leaf_blade_basic') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/3, Math.PI/3); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(46, 204, 113, ${v.life/15})`; ctx.lineWidth = 20; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
-                        else if (v.type === 'leaf_blade') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = `rgba(46, 204, 113, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
+                        else if (v.type === 'leaf_blade') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath();arc(0, 0, 140, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = `rgba(46, 204, 113, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'flare_blitz') { ctx.beginPath(); ctx.arc(v.x, v.y, 100 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(231, 76, 60, ${v.life/25})`; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = '#f1c40f'; ctx.stroke(); }
                         else if (v.type === 'blaze_kick_explosion') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(211, 84, 0, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(-Math.PI/4); ctx.fillStyle = `rgba(231, 76, 60, ${v.life/35})`; ctx.fillRect(-40, -150, 80, 300); ctx.restore(); }
                         else if (v.type === 'sun_slash') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(243, 156, 18, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
