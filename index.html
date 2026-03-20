@@ -314,7 +314,7 @@
         const pokemonDefs = {
             pikachu: { name: "PIKACHU", speed: 8.5, glowColor: '#f1c40f', gif: 'https://play.pokemonshowdown.com/sprites/xyani/pikachu.gif', spriteWidth: 45, collisionRadius: 22, skills: { q: { name: "Electro Ball", cd: 3000 }, e: { name: "Volt Tackle", cd: 500 }, r: { name: "Thunderbolt", cd: 12000 } }, stats: { speed: 4, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Pichu", img: "pichu", width: 35}, {lvl: 10, name: "Pikachu", img: "pikachu", width: 45}] },
             cinderace: { name: "CINDERACE", speed: 8.2, glowColor: '#e74c3c', gif: 'https://play.pokemonshowdown.com/sprites/xyani/cinderace.gif', spriteWidth: 28, collisionRadius: 18, skills: { q: { name: "Ember", cd: 4000 }, e: { name: "High Jump Kick", cd: 500 }, r: { name: "Pyro Ball", cd: 15000 } }, stats: { speed: 4, hp: 3, dmg: 5 }, stages: [{lvl: 1, name: "Scorbunny", img: "scorbunny", width: 35}, {lvl: 5, name: "Raboot", img: "raboot", width: 45}, {lvl: 10, name: "Cinderace", img: "cinderace", width: 45}] },
-            greninja: { name: "GRENINJA", speed: 15.0, glowColor: '#3498db', gif: 'https://play.pokemonshowdown.com/sprites/xyani/greninja.gif', megaGif: 'greninja-ash', spriteWidth: 80, megaSpriteWidth: 40, collisionRadius: 22, megaCollisionRadius: 12, skills: { q: { name: "Water Pulse", cd: 3000 }, e: { name: "Dragon Cut", cd: 500 }, r: { name: "Water Shuriken", cd: 14000 } }, stats: { speed: 5, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Froakie", img: "froakie", width: 35}, {lvl: 5, name: "Frogadier", img: "frogadier", width: 45}, {lvl: 10, name: "Greninja", img: "greninja", width: 80}] },
+            greninja: { name: "GRENINJA", speed: 15.0, glowColor: '#3498db', gif: 'https://play.pokemonshowdown.com/sprites/xyani/greninja.gif', megaGif: 'greninja-ash', spriteWidth: 80, megaSpriteWidth: 40, collisionRadius: 22, megaCollisionRadius: 10, skills: { q: { name: "Water Pulse", cd: 3000 }, e: { name: "Dragon Cut", cd: 500 }, r: { name: "Water Shuriken", cd: 14000 } }, stats: { speed: 5, hp: 4, dmg: 4 }, stages: [{lvl: 1, name: "Froakie", img: "froakie", width: 35}, {lvl: 5, name: "Frogadier", img: "frogadier", width: 45}, {lvl: 10, name: "Greninja", img: "greninja", width: 80}] },
             charizard: { name: "CHARIZARD", speed: 8.0, glowColor: '#d35400', gif: 'https://play.pokemonshowdown.com/sprites/xyani/charizard.gif', megaGif: 'charizard-megax', spriteWidth: 70, collisionRadius: 22, skills: { q: { name: "Dragon Claw", cd: 3500 }, e: { name: "Flamethrower", cd: 5000 }, r: { name: "Blast Burn", cd: 16000 } }, stats: { speed: 3, hp: 4, dmg: 5 }, stages: [{lvl: 1, name: "Charmander", img: "charmander", width: 35}, {lvl: 5, name: "Charmeleon", img: "charmeleon", width: 50}, {lvl: 10, name: "Charizard", img: "charizard", width: 70}] },
             venusaur: { name: "VENUSAUR", speed: 7.5, glowColor: '#27ae60', gif: 'https://play.pokemonshowdown.com/sprites/xyani/venusaur.gif', megaGif: 'venusaur-mega', spriteWidth: 80, collisionRadius: 25, skills: { q: { name: "Frenzy Plant", cd: 4000 }, e: { name: "Vine Whip", cd: 500 }, r: { name: "Solar Beam", cd: 15000 } }, stats: { speed: 3, hp: 5, dmg: 4 }, stages: [{lvl: 1, name: "Bulbasaur", img: "bulbasaur", width: 35}, {lvl: 5, name: "Ivysaur", img: "ivysaur", width: 60}, {lvl: 10, name: "Venusaur", img: "venusaur", width: 80}] },
             blastoise: { name: "BLASTOISE", speed: 7.8, glowColor: '#0984e3', gif: 'https://play.pokemonshowdown.com/sprites/xyani/blastoise.gif', megaGif: 'blastoise-mega', spriteWidth: 75, collisionRadius: 25, skills: { q: { name: "Hydro Pump", cd: 4000 }, e: { name: "Water Spout", cd: 500 }, r: { name: "Hydro Cannon", cd: 16000 } }, stats: { speed: 3, hp: 5, dmg: 5 }, stages: [{lvl: 1, name: "Squirtle", img: "squirtle", width: 35}, {lvl: 5, name: "Wartortle", img: "wartortle", width: 50}, {lvl: 10, name: "Blastoise", img: "blastoise", width: 75}] },
@@ -362,6 +362,31 @@
         ];
 
         const trees = []; const mobs = []; const projectiles = []; const damageTexts = []; const visualEffects = []; const fruits = []; const expOrbs = []; const hitSparks = []; const powerups = []; const houses = []; let droppedItems = [];
+
+        // Performance caps and throttles to reduce lag from excessive effects/projectiles
+        (function(){
+            const MAX_VISUAL_EFFECTS = 150;
+            visualEffects._push = visualEffects.push.bind(visualEffects);
+            visualEffects.push = function(effect){
+                if (this.length >= MAX_VISUAL_EFFECTS) return;
+                if (effect && effect.type === 'trail' && this.length > MAX_VISUAL_EFFECTS * 0.6 && Math.random() < 0.5) return;
+                this._push(effect);
+            };
+
+            const MAX_PROJECTILES = 200;
+            projectiles._push = projectiles.push.bind(projectiles);
+            projectiles.push = function(p){ if (this.length >= MAX_PROJECTILES) return; this._push(p); };
+
+            // Throttle container filter toggles (heavy on some GPUs). Use setContainerFilter instead of direct writes where possible.
+            let lastContainerFilterAt = 0;
+            window.setContainerFilter = function(el, filterStr, duration){
+                const now = Date.now();
+                if (now - lastContainerFilterAt < 80) return; // ignore too-frequent changes
+                lastContainerFilterAt = now;
+                el.style.filter = filterStr;
+                if (duration) setTimeout(()=> { if(el) el.style.filter = ''; }, duration);
+            };
+        })();
         let weatherParticles = []; let footstepDust = []; let mewtwoBoss = null;
 
         function triggerScreenShake(magnitude, duration) { screenShakeMagnitude = magnitude; screenShakeTime = duration; }
@@ -949,8 +974,9 @@
                 } else if (key === 'e') {
                     startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'leaf_blade', life: 25 });
-                        dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
+                        // Cập nhật đẩy tâm chiêu thức ra xa cho Sceptile
+                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'leaf_blade', life: 25 });
+                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
                     }, 150);
                 } else if (key === 'r') {
                     triggerScreenShake(20, 30);
@@ -967,15 +993,17 @@
                     if (key === 'q') {
                         startDash(angle, 55, 12, Math.round((500 + lvDmg) * dmgMultiplier));
                         setTimeout(() => {
-                            visualEffects.push({ x: player.x + Math.cos(angle)*40, y: player.y + Math.sin(angle)*40, angle: angle, type: 'aerial_ace', life: 20 });
-                            dealAoEDamage(player.x + Math.cos(angle)*50, player.y + Math.sin(angle)*50, 150, Math.round((700 + lvDmg) * dmgMultiplier), false);
+                            // Tăng tầm xa lên 180
+                            visualEffects.push({ x: player.x + Math.cos(angle)*180, y: player.y + Math.sin(angle)*180, angle: angle, type: 'aerial_ace', life: 20 });
+                            dealAoEDamage(player.x + Math.cos(angle)*180, player.y + Math.sin(angle)*180, 150, Math.round((700 + lvDmg) * dmgMultiplier), false);
                         }, 150);
                     }
                     if (key === 'e') {
                         startDash(angle, 40, 12, Math.round((400 + lvDmg) * dmgMultiplier));
                         setTimeout(() => { 
-                            visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'night_slash', life: 25 }); 
-                            dealAoEDamage(player.x + Math.cos(angle)*40, player.y + Math.sin(angle)*40, 180, Math.round((800 + lvDmg * 2) * dmgMultiplier), true);
+                            // Tăng tầm xa lên 160
+                            visualEffects.push({ x: player.x + Math.cos(angle)*160, y: player.y + Math.sin(angle)*160, angle: angle, type: 'night_slash', life: 25 }); 
+                            dealAoEDamage(player.x + Math.cos(angle)*160, player.y + Math.sin(angle)*160, 180, Math.round((800 + lvDmg * 2) * dmgMultiplier), true);
                         }, 150);
                     }
                     if (key === 'r') { 
@@ -986,7 +1014,7 @@
                     if (key === 'q') fireProjectile(1, 18, 30, 'water', Math.round((350 + lvDmg) * dmgMultiplier), 0, false, angle); 
                     if (key === 'e') { 
                         startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier)); 
-                        setTimeout(() => { visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'cut', life: 25 }); dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 150, Math.round((600 + lvDmg) * dmgMultiplier), false); }, 150); 
+                        setTimeout(() => { visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'cut', life: 25 }); dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 150, Math.round((600 + lvDmg) * dmgMultiplier), false); }, 150); 
                     }
                     if (key === 'r') { triggerScreenShake(10, 10); fireProjectile(1, 20, 120, 'shuriken', Math.round((1400 + lvDmg * 4) * dmgMultiplier), 0, false, angle); }
                 }
@@ -1011,7 +1039,7 @@
                 if (key === 'r') { triggerScreenShake(25, 40); for(let m=0; m<6; m++) { setTimeout(() => { let mx = targetX + (Math.random()*400-200); let my = targetY + (Math.random()*400-200); visualEffects.push({ x: mx, y: my, type: 'meteor', life: 30 }); setTimeout(() => dealAoEDamage(mx, my, 200, Math.round((800 + lvDmg * 2) * dmgMultiplier), false), 300); }, m * 200); } }
             } else if (player.currentPokemon === 'lucario') {
                 if (key === 'q') { visualEffects.push({ x: player.x, y: player.y, type: 'aura_blast', life: 25 }); dealAoEDamage(player.x, player.y, 250, Math.round((600 + lvDmg*2) * dmgMultiplier), false); }
-                if (key === 'e') { startDash(angle, 40, 15, Math.round((300 + lvDmg) * dmgMultiplier)); setTimeout(() => { visualEffects.push({ x: player.x, y: player.y, type: 'aura_punch', life: 20, angle: angle }); dealAoEDamage(player.x, player.y, 180, Math.round((700 + lvDmg) * dmgMultiplier), false); }, 250); }
+                if (key === 'e') { startDash(angle, 40, 15, Math.round((300 + lvDmg) * dmgMultiplier)); setTimeout(() => { visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, type: 'aura_punch', life: 20, angle: angle }); dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 180, Math.round((700 + lvDmg) * dmgMultiplier), false); }, 250); }
                 if (key === 'r') { triggerScreenShake(15, 20); fireProjectile(1, 25, 80, 'aura_sphere', Math.round((1800 + lvDmg * 4) * dmgMultiplier), 0, false, angle); }
             } else if (player.currentPokemon === 'sylveon') {
                 if (key === 'q') fireProjectile(1, 15, 35, 'shadow_ball', Math.round((400 + lvDmg) * dmgMultiplier), 0, false, angle); 
@@ -1021,6 +1049,21 @@
                 if (key === 'q') fireProjectile(3, 14, 30, 'rock_throw', Math.round((350 + lvDmg) * dmgMultiplier), 0.25, false, angle);
                 if (key === 'e') { for(let f=0; f<10; f++) { setTimeout(() => fireProjectile(1, 12, 40, 'frost', Math.round((200 + lvDmg*0.5) * dmgMultiplier), 0, false, angle + (Math.random()*0.4-0.2)), f*40); } }
                 if (key === 'r') { triggerScreenShake(30, 40); visualEffects.push({ x: targetX, y: targetY, type: 'meteor_beam', life: 40 }); setTimeout(() => dealAoEDamage(targetX, targetY, 250, Math.round((2500 + lvDmg * 5) * dmgMultiplier), false), 300); }
+            } else if (player.currentPokemon === 'sceptile') {
+                if (key === 'q') fireProjectile(1, 16, 40, 'energy_ball', Math.round((350 + lvDmg) * dmgMultiplier), 0, false, angle);
+                if (key === 'e') {
+                    startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
+                    setTimeout(() => {
+                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'leaf_blade', life: 25 });
+                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
+                    }, 150);
+                }
+                if (key === 'r') {
+                    triggerScreenShake(20, 20);
+                    for(let f=0; f<15; f++) {
+                        setTimeout(() => fireProjectile(1, 14, 45, 'leaf', Math.round((180 + lvDmg*0.5) * dmgMultiplier), 0, false, angle + (Math.random()*0.8-0.4)), f*40);
+                    }
+                }
             } else if (player.currentPokemon === 'blaziken') {
                 if (key === 'q') {
                     startDash(angle, 40, 15, Math.round((450 + lvDmg) * dmgMultiplier));
@@ -1029,8 +1072,8 @@
                 if (key === 'e') {
                     startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'fire_kick', life: 20 });
-                        dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 140, Math.round((550 + lvDmg) * dmgMultiplier), false);
+                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'fire_kick', life: 20 });
+                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 140, Math.round((550 + lvDmg) * dmgMultiplier), false);
                     }, 150);
                 }
                 if (key === 'r') {
@@ -1067,8 +1110,8 @@
                 if (key === 'e') {
                     startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'leaf_blade', life: 25 });
-                        dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
+                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'leaf_blade', life: 25 });
+                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
                     }, 150);
                 }
                 if (key === 'r') {
@@ -1107,8 +1150,8 @@
                 if (key === 'e') {
                     startDash(angle, 40, 10, Math.round((300 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'vine_whip_skill', life: 20 });
-                        dealAoEDamage(player.x + Math.cos(angle)*40, player.y + Math.sin(angle)*40, 160, Math.round((450 + lvDmg) * dmgMultiplier), false);
+                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'vine_whip_skill', life: 20 });
+                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 160, Math.round((450 + lvDmg) * dmgMultiplier), false);
                     }, 100);
                 }
                 if (key === 'r') {
@@ -1141,8 +1184,8 @@
                 if (key === 'e') {
                     startDash(angle, 45, 12, Math.round((400 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        visualEffects.push({ x: player.x + Math.cos(angle)*30, y: player.y + Math.sin(angle)*30, angle: angle, type: 'dragon_claw', life: 20 });
-                        dealAoEDamage(player.x + Math.cos(angle)*40, player.y + Math.sin(angle)*40, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
+                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'dragon_claw', life: 20 });
+                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
                     }, 150);
                 }
                 if (key === 'r') {
@@ -1161,12 +1204,13 @@
                 if (key === 'e') {
                     startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        visualEffects.push({ x: player.x, y: player.y, angle: angle, type: 'breaking_swipe', life: 20 });
-                        dealAoEDamage(player.x + Math.cos(angle)*30, player.y + Math.sin(angle)*30, 160, Math.round((600 + lvDmg) * dmgMultiplier), false);
+                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'breaking_swipe', life: 20 });
+                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 160, Math.round((600 + lvDmg) * dmgMultiplier), false);
                     }, 150);
                 }
                 if (key === 'r') {
                     triggerScreenShake(20, 20);
+                    // Bắn 2 con rồng cùng lúc, giảm lag. Sát thương nhân 6 mỗi con để bù lại (tổng dmg = 12 mũi tên cũ).
                     fireProjectile(2, 25, 25, 'dragon_dart', Math.round((2400 + lvDmg * 6) * dmgMultiplier), 0.2, false, angle);
                 }
             }
@@ -1849,7 +1893,7 @@
                         else if (v.type === 'blaze_kick_explosion') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(211, 84, 0, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(-Math.PI/4); ctx.fillStyle = `rgba(231, 76, 60, ${v.life/35})`; ctx.fillRect(-40, -150, 80, 300); ctx.restore(); }
                         else if (v.type === 'sun_slash') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(243, 156, 18, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'psychic_fangs') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.moveTo(0, -80); ctx.lineTo(120, 0); ctx.lineTo(0, 80); ctx.strokeStyle = `rgba(155, 89, 182, ${v.life/25})`; ctx.lineWidth = 30; ctx.lineJoin = 'miter'; ctx.stroke(); ctx.beginPath(); ctx.moveTo(20, -60); ctx.lineTo(100, 0); ctx.lineTo(20, 60); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/25})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
-                        else if (v.type === 'sunsteel_charge') { ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba243, 156, 18, ${v.life/20})`; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#f1c40f'; ctx.stroke(); }
+                        else if (v.type === 'sunsteel_charge') { ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(243, 156, 18, ${v.life/20})`; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#f1c40f'; ctx.stroke(); }
                         else if (v.type === 'sunsteel_blast') { ctx.beginPath(); ctx.arc(v.x, v.y, 400 - v.life*6, 0, Math.PI*2); ctx.fillStyle = `rgba(243, 156, 18, ${v.life/40})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(255, 255, 255, ${v.life/40})`; ctx.fill(); ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.life * 0.1); for(let j=0; j<8; j++) { ctx.rotate(Math.PI/4); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/40})`; ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, 0); ctx.lineTo(0, 300); ctx.fill(); } ctx.restore(); }
                         else if (v.type === 'close_combat') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/25})`; for(let j=0; j<5; j++) { ctx.beginPath(); ctx.ellipse((Math.random()-0.5)*100, (Math.random()-0.5)*100, 40, 10, 0, 0, Math.PI*2); ctx.fill(); } ctx.restore(); }
                         else if (v.type === 'meteor_assault') { ctx.beginPath(); ctx.arc(v.x, v.y, 250 - v.life*4, 0, Math.PI*2); ctx.fillStyle = `rgba(241, 196, 15, ${v.life/35})`; ctx.fill(); ctx.beginPath(); ctx.arc(v.x, v.y, 150 - v.life*2, 0, Math.PI*2); ctx.fillStyle = `rgba(230, 126, 34, ${v.life/35})`; ctx.fill(); ctx.lineWidth = 15; ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/35})`; ctx.stroke(); }
