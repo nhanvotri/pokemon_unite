@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Mini Raft HTML5</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #0077be; font-family: sans-serif; }
+        canvas { display: block; }
+        #ui {
+            position: absolute; top: 10px; left: 10px;
+            color: white; text-shadow: 2px 2px 4px #000;
+            pointer-events: none;
+        }
+        .controls { position: absolute; bottom: 10px; left: 10px; color: rgba(255,255,255,0.7); font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <h2>Raft Mini-Survivor</h2>
+    <p>Gỗ (Plank): <span id="woodCount">0</span></p>
+    <p>Kích thước bè: <span id="raftSize">1</span>x1</p>
+    <p id="msg">Di chuyển để nhặt gỗ trên biển!</p>
+</div>
+
+<div class="controls">
+    WASD / Mũi tên: Di chuyển | Space: Mở rộng bè (Tốn 5 gỗ)
+</div>
+
+<script>
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+document.body.appendChild(canvas);
+
+// Khởi tạo thông số
+let wood = 0;
+let raftLevel = 1;
+const player = { x: 0, y: 0, size: 20, speed: 4 };
+const camera = { x: 0, y: 0 };
+let resources = [];
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Điều khiển
+const keys = {};
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+// Tạo tài nguyên ngẫu nhiên
+function spawnResource() {
+    if (resources.length < 20) {
+        resources.push({
+            x: player.x + (Math.random() - 0.5) * 2000,
+            y: player.y + (Math.random() - 0.5) * 2000,
+            size: 15
+        });
+    }
+}
+
+function update() {
+    // Di chuyển nhân vật
+    if (keys['KeyW'] || keys['ArrowUp']) player.y -= player.speed;
+    if (keys['KeyS'] || keys['ArrowDown']) player.y += player.speed;
+    if (keys['KeyA'] || keys['ArrowLeft']) player.x -= player.speed;
+    if (keys['KeyD'] || keys['ArrowRight']) player.x += player.speed;
+
+    // Camera đi theo nhân vật
+    camera.x = player.x - canvas.width / 2;
+    camera.y = player.y - canvas.height / 2;
+
+    // Kiểm tra va chạm nhặt gỗ
+    resources = resources.filter(res => {
+        const dist = Math.hypot(player.x - res.x, player.y - res.y);
+        if (dist < 30) {
+            wood++;
+            document.getElementById('woodCount').innerText = wood;
+            return false;
+        }
+        return true;
+    });
+
+    // Mở rộng bè
+    if (keys['Space'] && wood >= 5) {
+        wood -= 5;
+        raftLevel++;
+        document.getElementById('woodCount').innerText = wood;
+        document.getElementById('raftSize').innerText = raftLevel;
+        keys['Space'] = false; // Tránh bấm giữ
+    }
+
+    spawnResource();
+}
+
+function draw() {
+    // Vẽ nền biển
+    ctx.fillStyle = '#0077be';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(-camera.x, -camera.y);
+
+    // Vẽ bè (Raft)
+    ctx.fillStyle = '#8B4513';
+    const raftVisualSize = 40 + (raftLevel * 10);
+    ctx.fillRect(player.x - raftVisualSize/2, player.y - raftVisualSize/2, raftVisualSize, raftVisualSize);
+    
+    // Vẽ chi tiết các tấm ván trên bè
+    ctx.strokeStyle = '#5D2E0C';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(player.x - raftVisualSize/2, player.y - raftVisualSize/2, raftVisualSize, raftVisualSize);
+
+    // Vẽ nhân vật
+    ctx.fillStyle = '#ffdbac';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Vẽ gỗ trôi sông
+    ctx.fillStyle = '#deb887';
+    resources.forEach(res => {
+        ctx.fillRect(res.x, res.y, res.size, res.size + 5);
+    });
+
+    ctx.restore();
+    requestAnimationFrame(gameLoop);
+}
+
+function gameLoop() {
+    update();
+    draw();
+}
+
+setInterval(spawnResource, 1000);
+gameLoop();
+
+</script>
+</body>
+</html>
