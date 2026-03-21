@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pokemon Unite - Ultimate Awakened Engine V8</title>
+    <title>Pokemon Unite - Ultimate Awakened Engine V10 (Ultra Optimized)</title>
     <style>
         /* ==========================================================================
            [1] CSS RESET & BASE LAYOUT
@@ -44,7 +44,6 @@
         .menuBtn:hover { transform: translateY(-3px); background: #34495e; border-color: #bdc3c7;}
         .menuBtn.active { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 25px rgba(255,255,255,0.4); border-width: 3px;}
         
-        /* Màu gradient riêng theo từng hệ của Pokémon */
         #menuBtnPikachu.active { background: linear-gradient(135deg, #f39c12, #f1c40f); color: #000; box-shadow: 0 5px 20px rgba(241, 196, 15, 0.5);} 
         #menuBtnCinderace.active { background: linear-gradient(135deg, #d35400, #e74c3c); box-shadow: 0 5px 20px rgba(231, 76, 60, 0.5);} 
         #menuBtnGreninja.active { background: linear-gradient(135deg, #2980b9, #3498db); box-shadow: 0 5px 20px rgba(52, 152, 219, 0.5);}
@@ -365,15 +364,15 @@
 
         // Performance caps and throttles to reduce lag from excessive effects/projectiles
         (function(){
-            const MAX_VISUAL_EFFECTS = 150;
+            const MAX_VISUAL_EFFECTS = 75; // Giảm số lượng hiệu ứng để chống lag
             visualEffects._push = visualEffects.push.bind(visualEffects);
             visualEffects.push = function(effect){
                 if (this.length >= MAX_VISUAL_EFFECTS) return;
-                if (effect && effect.type === 'trail' && this.length > MAX_VISUAL_EFFECTS * 0.6 && Math.random() < 0.5) return;
+                if (effect && effect.type === 'trail' && this.length > MAX_VISUAL_EFFECTS * 0.5 && Math.random() < 0.5) return;
                 this._push(effect);
             };
 
-            const MAX_PROJECTILES = 200;
+            const MAX_PROJECTILES = 100;
             projectiles._push = projectiles.push.bind(projectiles);
             projectiles.push = function(p){ if (this.length >= MAX_PROJECTILES) return; this._push(p); };
 
@@ -388,6 +387,74 @@
             };
         })();
         let weatherParticles = []; let footstepDust = []; let mewtwoBoss = null;
+
+        // --- Bắt đầu phần chép đè ---
+        // Canvas Pre-rendering (Tạo Canvas ảo để vẽ trước)
+        const cacheCanvas = document.createElement('canvas');
+        const cacheCtx = cacheCanvas.getContext('2d', { alpha: true });
+        const objCache = {}; // Lưu trữ ảnh đã render
+
+        // Hàm tạo hình ảnh cây/đá/v.v và lưu vào bộ nhớ cache
+        function prerenderObject(type, radius, c1, c2, c3) {
+            const cacheKey = `${type}_${radius}_${c1}_${c2}_${c3}`;
+            if (objCache[cacheKey]) return objCache[cacheKey];
+
+            const padding = 20;
+            const size = (radius * 2) + padding * 2;
+            
+            // Nếu ảnh quá to (bug logic), giới hạn lại để tránh lag vram
+            if(size > 500) return null;
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tCtx = tempCanvas.getContext('2d');
+            
+            // Vẽ vào tâm của tempCanvas
+            tCtx.translate(size/2, size/2);
+
+            // Bóng
+            tCtx.beginPath(); tCtx.ellipse(0, radius * 0.7, radius * 0.9, radius * 0.5, 0, 0, Math.PI * 2); tCtx.fillStyle = 'rgba(0,0,0,0.25)'; tCtx.fill(); 
+            
+            if (type === 'bush' || type === 'flower') {
+                let grad = tCtx.createRadialGradient(0, 0, radius*0.2, 0, 0, radius); grad.addColorStop(0, c2); grad.addColorStop(1, c1);
+                tCtx.beginPath(); tCtx.arc(0, 0, radius, 0, Math.PI*2); tCtx.fillStyle = grad; tCtx.fill(); tCtx.lineWidth = 4; tCtx.strokeStyle = c3; tCtx.stroke();
+                if(type === 'flower') { tCtx.fillStyle = c3; for(let f=0; f<5; f++){ let a=f*Math.PI*2/5; tCtx.beginPath(); tCtx.arc(Math.cos(a)*radius*0.5, Math.sin(a)*radius*0.5, radius*0.25, 0, Math.PI*2); tCtx.fill(); tCtx.lineWidth=2; tCtx.strokeStyle=c2; tCtx.stroke(); } }
+            } else if (type === 'pine') {
+                tCtx.fillStyle = '#6d4c2c'; tCtx.fillRect(-radius*0.18, 0, radius*0.36, radius);
+                tCtx.strokeStyle = '#4e342e'; tCtx.lineWidth = 2; tCtx.beginPath(); tCtx.moveTo(-radius*0.1, radius*0.2); tCtx.lineTo(-radius*0.1, radius*0.8); tCtx.moveTo(radius*0.1, radius*0.2); tCtx.lineTo(radius*0.1, radius*0.8); tCtx.stroke();
+                let grad = tCtx.createLinearGradient(0, -radius, 0, radius*0.2); grad.addColorStop(0, c1); grad.addColorStop(1, c2);
+                for(let i=0; i<4; i++){ let w = radius - i*radius*0.2; let yt = -radius*0.2 - i*radius*0.4; tCtx.beginPath(); tCtx.moveTo(0, yt-radius); tCtx.lineTo(-w, yt+radius*0.5); tCtx.lineTo(w, yt+radius*0.5); tCtx.fillStyle = grad; tCtx.fill(); }
+            } else if (type === 'mushroom') {
+                let grad = tCtx.createLinearGradient(0, 0, 0, radius*0.8); grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#e1d7c6');
+                tCtx.fillStyle = grad; tCtx.fillRect(-radius*0.2, 0, radius*0.4, radius*0.8);
+                let grad2 = tCtx.createRadialGradient(0, -radius*0.2, radius*0.2, 0, 0, radius); grad2.addColorStop(0, c2); grad2.addColorStop(1, c3);
+                tCtx.beginPath(); tCtx.arc(0, 0, radius, Math.PI, 0); tCtx.fillStyle = grad2; tCtx.fill(); tCtx.fillStyle = '#fff'; tCtx.beginPath(); tCtx.arc(-radius*0.4, -radius*0.4, radius*0.15, 0, Math.PI*2); tCtx.fill(); tCtx.beginPath(); tCtx.arc(radius*0.3, -radius*0.6, radius*0.1, 0, Math.PI*2); tCtx.fill(); tCtx.beginPath(); tCtx.arc(0, -radius*0.2, radius*0.2, 0, Math.PI*2); tCtx.fill();
+            } else if (type === 'cactus') {
+                let grad = tCtx.createLinearGradient(0, radius, 0, -radius); grad.addColorStop(0, c1); grad.addColorStop(1, c2);
+                tCtx.lineCap='round'; tCtx.lineJoin='round'; tCtx.strokeStyle=grad; tCtx.lineWidth=radius*0.5; tCtx.beginPath(); tCtx.moveTo(0,radius); tCtx.lineTo(0,-radius); tCtx.stroke();
+                tCtx.beginPath(); tCtx.moveTo(0,0); tCtx.lineTo(-radius*0.6,0); tCtx.lineTo(-radius*0.6,-radius*0.5); tCtx.stroke(); tCtx.beginPath(); tCtx.moveTo(0,radius*0.3); tCtx.lineTo(radius*0.6,radius*0.3); tCtx.lineTo(radius*0.6,-radius*0.3); tCtx.stroke();
+            } else if (type === 'rock') {
+                let grad = tCtx.createRadialGradient(0, 0, radius*0.3, 0, 0, radius); grad.addColorStop(0, c2); grad.addColorStop(1, c1);
+                tCtx.fillStyle=grad; tCtx.beginPath(); for(let i=0;i<8;i++){ let a=i*Math.PI*2/8; let r=radius*(0.7+(i%2===0?0.3:0)); tCtx.lineTo(Math.cos(a)*r,Math.sin(a)*r); } tCtx.fill(); tCtx.lineWidth = 3; tCtx.strokeStyle = c3; tCtx.stroke();
+                tCtx.fillStyle=c2; tCtx.beginPath(); tCtx.moveTo(0,-radius*0.5); tCtx.lineTo(-radius*0.5,0); tCtx.lineTo(0,radius*0.5); tCtx.fill();
+            } else if (type === 'dead_tree') {
+                tCtx.strokeStyle=c1; tCtx.lineWidth=radius*0.3; tCtx.lineCap='round'; tCtx.beginPath(); tCtx.moveTo(0,radius); tCtx.lineTo(0,-radius); tCtx.stroke();
+                tCtx.strokeStyle=c2; tCtx.lineWidth=radius*0.12; tCtx.beginPath(); tCtx.moveTo(0,-radius*0.5); tCtx.lineTo(-radius*0.5,-radius*0.8); tCtx.moveTo(0,-radius*0.7); tCtx.lineTo(radius*0.4,-radius*1.1); tCtx.stroke();
+                tCtx.lineWidth=radius*0.15; tCtx.beginPath(); tCtx.moveTo(0,0); tCtx.lineTo(-radius*0.8,-radius*0.5); tCtx.stroke(); tCtx.beginPath(); tCtx.moveTo(0,-radius*0.4); tCtx.lineTo(radius*0.7,-radius*0.8); tCtx.stroke();
+            } else if (type === 'crystal') {
+                tCtx.fillStyle=c2; tCtx.beginPath(); tCtx.moveTo(0,-radius*1.2); tCtx.lineTo(radius*0.5,0); tCtx.lineTo(0,radius); tCtx.lineTo(-radius*0.5,0); tCtx.fill();
+                tCtx.fillStyle=c3; tCtx.beginPath(); tCtx.moveTo(0,-radius*1.2); tCtx.lineTo(radius*0.2,0); tCtx.lineTo(0,radius); tCtx.fill();
+            } else if (type === 'energy_node') {
+                tCtx.fillStyle=c2; tCtx.beginPath(); tCtx.moveTo(0,-radius); tCtx.lineTo(radius*0.7,0); tCtx.lineTo(0,radius); tCtx.lineTo(-radius*0.7,0); tCtx.fill();
+                tCtx.fillStyle='#fff'; tCtx.beginPath(); tCtx.arc(0,0,radius*0.25,0,Math.PI*2); tCtx.fill();
+            } else if (type === 'dry_bush') {
+                tCtx.fillStyle=c1; tCtx.beginPath(); for(let i=0;i<16;i++){ let a=i*Math.PI*2/16; let r=radius*(0.6+Math.random()*0.5); tCtx.lineTo(Math.cos(a)*r,Math.sin(a)*r); } tCtx.fill();
+            }
+
+            objCache[cacheKey] = { img: tempCanvas, size: size, offset: size/2 };
+            return objCache[cacheKey];
+        }
 
         function triggerScreenShake(magnitude, duration) { screenShakeMagnitude = magnitude; screenShakeTime = duration; }
 
@@ -656,6 +723,9 @@
                 });
             }
 
+            // Gọi prerender để cache hình ảnh cây
+            currentMap.types.forEach(t => { prerenderObject(t, 40, currentMap.obs[0], currentMap.obs[1], currentMap.obs[2]); });
+
             for (let i = 0; i < 800; i++) {
                 let tx = Math.random() * (WORLD_WIDTH - 200) + 100;
                 let ty = Math.random() * (WORLD_HEIGHT - 200) + 100;
@@ -668,6 +738,9 @@
 
                 let typeStr = currentMap.types[Math.floor(Math.random() * currentMap.types.length)];
                 trees.push({ x: tx, y: ty, radius: 25 + Math.random() * 30, type: typeStr, c1: currentMap.obs[0], c2: currentMap.obs[1], c3: currentMap.obs[2] });
+                
+                // Tiền-xử-lý các cây to / nhỏ khác nhau
+                prerenderObject(typeStr, trees[trees.length-1].radius, currentMap.obs[0], currentMap.obs[1], currentMap.obs[2]);
             }
             for (let i = 0; i < 80; i++) { spawnFruit(); }
             
@@ -929,8 +1002,8 @@
             dealAoEDamage(attackX, attackY, 130, basicDmg, isCrit); playBasicAttackAnimation();
         }
 
-        function playBasicAttackAnimation() { player.attackFrames = 12; containerEl.style.filter = `drop-shadow(0px 0px 30px ${pokemonDefs[player.currentPokemon].glowColor}) brightness(1.5)`; setTimeout(() => { containerEl.style.filter = ''; }, 150); }
-        function playSkillAnimation() { player.attackFrames = 25; containerEl.style.filter = `drop-shadow(0px 0px 50px ${pokemonDefs[player.currentPokemon].glowColor}) brightness(2)`; setTimeout(() => { containerEl.style.filter = ''; }, 300); }
+        function playBasicAttackAnimation() { player.attackFrames = 12; window.setContainerFilter(containerEl, `drop-shadow(0px 0px 30px ${pokemonDefs[player.currentPokemon].glowColor}) brightness(1.5)`, 150); }
+        function playSkillAnimation() { player.attackFrames = 25; window.setContainerFilter(containerEl, `drop-shadow(0px 0px 50px ${pokemonDefs[player.currentPokemon].glowColor}) brightness(2)`, 300); }
 
         function dealPlayerAoEDamage(x, y, radius, damage) {
             if (!isPlaying || player.dashTime > 0 || player.buffs.shield > 0 || player.inHouseFlag) return;
@@ -974,7 +1047,7 @@
                 } else if (key === 'e') {
                     startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        // Cập nhật đẩy tâm chiêu thức ra xa cho Sceptile
+                        // Sceptile chém xa
                         visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'leaf_blade', life: 25 });
                         dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
                     }, 150);
@@ -989,21 +1062,20 @@
                 return;
             } else if (player.currentPokemon === 'greninja') {
                 if (player.isMega) {
-                    // ASH GRENINJA SKILLS
                     if (key === 'q') {
                         startDash(angle, 55, 12, Math.round((500 + lvDmg) * dmgMultiplier));
                         setTimeout(() => {
-                            // Tăng tầm xa lên 180
-                            visualEffects.push({ x: player.x + Math.cos(angle)*180, y: player.y + Math.sin(angle)*180, angle: angle, type: 'aerial_ace', life: 20 });
-                            dealAoEDamage(player.x + Math.cos(angle)*180, player.y + Math.sin(angle)*180, 150, Math.round((700 + lvDmg) * dmgMultiplier), false);
+                            // Tăng tầm xa cho Aerial Ace (tâm hình ảnh xa ra 160px)
+                            visualEffects.push({ x: player.x + Math.cos(angle)*160, y: player.y + Math.sin(angle)*160, angle: angle, type: 'aerial_ace', life: 20 });
+                            dealAoEDamage(player.x + Math.cos(angle)*160, player.y + Math.sin(angle)*160, 150, Math.round((700 + lvDmg) * dmgMultiplier), false);
                         }, 150);
                     }
                     if (key === 'e') {
                         startDash(angle, 40, 12, Math.round((400 + lvDmg) * dmgMultiplier));
                         setTimeout(() => { 
-                            // Tăng tầm xa lên 160
-                            visualEffects.push({ x: player.x + Math.cos(angle)*160, y: player.y + Math.sin(angle)*160, angle: angle, type: 'night_slash', life: 25 }); 
-                            dealAoEDamage(player.x + Math.cos(angle)*160, player.y + Math.sin(angle)*160, 180, Math.round((800 + lvDmg * 2) * dmgMultiplier), true);
+                            // Tăng tầm xa cho Night Slash (tâm hình ảnh xa ra 140px)
+                            visualEffects.push({ x: player.x + Math.cos(angle)*140, y: player.y + Math.sin(angle)*140, angle: angle, type: 'night_slash', life: 25 }); 
+                            dealAoEDamage(player.x + Math.cos(angle)*140, player.y + Math.sin(angle)*140, 180, Math.round((800 + lvDmg * 2) * dmgMultiplier), true);
                         }, 150);
                     }
                     if (key === 'r') { 
@@ -1049,21 +1121,6 @@
                 if (key === 'q') fireProjectile(3, 14, 30, 'rock_throw', Math.round((350 + lvDmg) * dmgMultiplier), 0.25, false, angle);
                 if (key === 'e') { for(let f=0; f<10; f++) { setTimeout(() => fireProjectile(1, 12, 40, 'frost', Math.round((200 + lvDmg*0.5) * dmgMultiplier), 0, false, angle + (Math.random()*0.4-0.2)), f*40); } }
                 if (key === 'r') { triggerScreenShake(30, 40); visualEffects.push({ x: targetX, y: targetY, type: 'meteor_beam', life: 40 }); setTimeout(() => dealAoEDamage(targetX, targetY, 250, Math.round((2500 + lvDmg * 5) * dmgMultiplier), false), 300); }
-            } else if (player.currentPokemon === 'sceptile') {
-                if (key === 'q') fireProjectile(1, 16, 40, 'energy_ball', Math.round((350 + lvDmg) * dmgMultiplier), 0, false, angle);
-                if (key === 'e') {
-                    startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
-                    setTimeout(() => {
-                        visualEffects.push({ x: player.x + Math.cos(angle)*100, y: player.y + Math.sin(angle)*100, angle: angle, type: 'leaf_blade', life: 25 });
-                        dealAoEDamage(player.x + Math.cos(angle)*100, player.y + Math.sin(angle)*100, 150, Math.round((600 + lvDmg) * dmgMultiplier), false);
-                    }, 150);
-                }
-                if (key === 'r') {
-                    triggerScreenShake(20, 20);
-                    for(let f=0; f<15; f++) {
-                        setTimeout(() => fireProjectile(1, 14, 45, 'leaf', Math.round((180 + lvDmg*0.5) * dmgMultiplier), 0, false, angle + (Math.random()*0.8-0.4)), f*40);
-                    }
-                }
             } else if (player.currentPokemon === 'blaziken') {
                 if (key === 'q') {
                     startDash(angle, 40, 15, Math.round((450 + lvDmg) * dmgMultiplier));
@@ -1089,8 +1146,8 @@
                 if (key === 'e') {
                     startDash(angle, 45, 12, Math.round((350 + lvDmg) * dmgMultiplier));
                     setTimeout(() => {
-                        visualEffects.push({ x: player.x + Math.cos(angle)*30, y: player.y + Math.sin(angle)*30, angle: angle, type: 'psychic_fangs', life: 25 });
-                        dealAoEDamage(player.x + Math.cos(angle)*40, player.y + Math.sin(angle)*40, 160, Math.round((600 + lvDmg) * dmgMultiplier), false);
+                        visualEffects.push({ x: player.x + Math.cos(angle)*80, y: player.y + Math.sin(angle)*80, angle: angle, type: 'psychic_fangs', life: 25 });
+                        dealAoEDamage(player.x + Math.cos(angle)*80, player.y + Math.sin(angle)*80, 160, Math.round((600 + lvDmg) * dmgMultiplier), false);
                     }, 150);
                 }
                 if (key === 'r') {
@@ -1104,8 +1161,8 @@
                 }
             } else if (player.currentPokemon === 'sirfetchd') {
                 if (key === 'q') {
-                    visualEffects.push({ x: player.x + Math.cos(angle)*40, y: player.y + Math.sin(angle)*40, angle: angle, type: 'close_combat', life: 25 });
-                    dealAoEDamage(player.x + Math.cos(angle)*50, player.y + Math.sin(angle)*50, 150, Math.round((500 + lvDmg * 1.5) * dmgMultiplier), false);
+                    visualEffects.push({ x: player.x + Math.cos(angle)*60, y: player.y + Math.sin(angle)*60, angle: angle, type: 'close_combat', life: 25 });
+                    dealAoEDamage(player.x + Math.cos(angle)*60, player.y + Math.sin(angle)*60, 150, Math.round((500 + lvDmg * 1.5) * dmgMultiplier), false);
                 }
                 if (key === 'e') {
                     startDash(angle, 45, 10, Math.round((400 + lvDmg) * dmgMultiplier));
@@ -1243,8 +1300,7 @@
             
             if(mob.imgElement) { 
                 mob.isFlashing = true;
-                mob.imgElement.style.filter = 'brightness(3) sepia(1) hue-rotate(-50deg) saturate(5)'; 
-                setTimeout(() => { if (mob.imgElement) { mob.imgElement.style.filter = 'none'; mob.isFlashing = false;} }, 120); 
+                window.setContainerFilter(mob.imgElement, 'brightness(3) sepia(1) hue-rotate(-50deg) saturate(5)', 120);
             }
             
             if (mob.hp <= 0) { 
@@ -1254,7 +1310,7 @@
                     comboCount++; comboTimer = MAX_COMBO_TIMER; updateComboUI();
                     spawnExpOrb(mob.x, mob.y, mob.xpReward); 
                     if(mob.isElite && Math.random() < 0.5) spawnPowerup(mob.x, mob.y);
-                    setTimeout(spawnMob, 1000); 
+                    setTimeout(() => { if(isPlaying) spawnMob(); }, 1000); 
                 }
             }
         }
@@ -1266,7 +1322,7 @@
             player.hp -= amount; audioSystem.playSFX('hit'); triggerScreenShake(8, 8); 
             damageTexts.push({ x: player.x + (Math.random()*40-20), y: player.y - 50, text: amount, life: 35, color: '#9b59b6', size: 30 });
             document.getElementById('playerHpFill').style.width = Math.max(0, (player.hp / player.maxHp) * 100) + '%';
-            spriteEl.style.filter = 'brightness(3) saturate(5) hue-rotate(300deg)'; setTimeout(() => { spriteEl.style.filter = 'drop-shadow(0px 15px 10px rgba(0,0,0,0.8))'; }, 150);
+            window.setContainerFilter(spriteEl, 'brightness(3) saturate(5) hue-rotate(300deg)', 150);
             
             if (player.hp <= 0) { isPlaying = false; setTimeout(() => { alert("You have fallen! Journey ends at Level " + player.level + "."); handleDeath(); }, 100); }
         }
@@ -1290,7 +1346,7 @@
                 lvlUpText.innerHTML = `LEVEL UP!<br><span style="font-size: 20px; color:#2ecc71;">+1 SKILL | +HP | +DAMAGE</span>`;
                 lvlUpText.style.position = 'absolute'; lvlUpText.style.left = '50%'; lvlUpText.style.top = '40%'; lvlUpText.style.transform = 'translate(-50%, -50%)'; lvlUpText.style.color = '#f1c40f'; lvlUpText.style.fontSize = '45px'; lvlUpText.style.fontWeight = '900'; lvlUpText.style.textShadow = '0 0 30px #000'; lvlUpText.style.zIndex = '100'; lvlUpText.style.textAlign = 'center';
                 document.body.appendChild(lvlUpText); setTimeout(() => lvlUpText.remove(), 2500);
-                containerEl.style.filter = 'drop-shadow(0px 0px 80px #f1c40f) brightness(2)'; setTimeout(() => containerEl.style.filter = 'drop-shadow(0px 15px 10px rgba(0,0,0,0.8))', 1200);
+                window.setContainerFilter(containerEl, 'drop-shadow(0px 0px 80px #f1c40f) brightness(2)', 1200);
             }
             document.getElementById('xpBarFill').style.width = (player.xp / player.maxXp * 100) + '%';
         }
@@ -1373,19 +1429,25 @@
             }
 
             for (let i = fruits.length - 1; i >= 0; i--) {
-                let f = fruits[i]; const dist = Math.hypot(player.x - f.x, player.y - f.y);
+                let f = fruits[i]; 
+                if (Math.abs(player.x - f.x) > 300 || Math.abs(player.y - f.y) > 300) continue; // Tối ưu: Bỏ qua nếu quá xa
+                const dist = Math.hypot(player.x - f.x, player.y - f.y);
                 if (dist < currentCollisionRadius + f.radius + 150) { const angle = Math.atan2(player.y - f.y, player.x - f.x); f.x += Math.cos(angle) * 12; f.y += Math.sin(angle) * 12; }
                 if (dist < currentCollisionRadius + f.radius) { player.hp = Math.min(player.maxHp, player.hp + f.type.heal); audioSystem.playSFX('heal'); damageTexts.push({ x: player.x, y: player.y - 60, text: "+" + f.type.heal, life: 50, color: "#2ecc71", size: 30 }); document.getElementById('playerHpFill').style.width = (player.hp / player.maxHp * 100) + '%'; fruits.splice(i, 1); setTimeout(spawnFruit, 8000); }
             }
 
             for (let i = expOrbs.length - 1; i >= 0; i--) {
-                let o = expOrbs[i]; o.life--; const dist = Math.hypot(player.x - o.x, player.y - o.y);
+                let o = expOrbs[i]; o.life--; 
+                if (Math.abs(player.x - o.x) > 400 || Math.abs(player.y - o.y) > 400) continue; // Tối ưu: Bỏ qua nếu quá xa
+                const dist = Math.hypot(player.x - o.x, player.y - o.y);
                 if(dist < 250) { const angle = Math.atan2(player.y - o.y, player.x - o.x); o.x += Math.cos(angle) * 15; o.y += Math.sin(angle) * 15; }
                 if (dist < currentCollisionRadius + o.radius) { gainXp(o.value); expOrbs.splice(i, 1); } else if (o.life <= 0) { expOrbs.splice(i, 1); }
             }
 
             for (let i = powerups.length - 1; i >= 0; i--) {
-                let p = powerups[i]; p.life--; const dist = Math.hypot(player.x - p.x, player.y - p.y);
+                let p = powerups[i]; p.life--; 
+                if (Math.abs(player.x - p.x) > 200 || Math.abs(player.y - p.y) > 200) continue; // Tối ưu
+                const dist = Math.hypot(player.x - p.x, player.y - p.y);
                 if (dist < currentCollisionRadius + p.radius) { audioSystem.playSFX('powerup'); if(p.type==='damage') player.buffs.damage = 10000; if(p.type==='speed') player.buffs.speed = 10000; if(p.type==='shield') player.buffs.shield = 5000; powerups.splice(i, 1); } else if (p.life <= 0) { powerups.splice(i, 1); }
             }
 
@@ -1395,6 +1457,7 @@
                 item.vx *= 0.9; item.vy *= 0.9;
                 item.life--;
                 
+                if (Math.abs(player.x - item.x) > 100 || Math.abs(player.y - item.y) > 100) continue; // Tối ưu
                 if (Math.hypot(player.x - item.x, player.y - item.y) < currentCollisionRadius + 20) {
                     applyItem(item.type, item.x, item.y);
                     droppedItems.splice(i, 1);
@@ -1440,6 +1503,8 @@
 
             let res = player;
             for (let t of trees) {
+                // Tối ưu thuật toán check va chạm (AABB)
+                if (Math.abs(res.x - t.x) > 100 || Math.abs(res.y - t.y) > 100) continue;
                 const dist = Math.hypot(res.x - t.x, res.y - t.y);
                 if (dist < currentCollisionRadius + t.radius - 15) { const angle = Math.atan2(res.y - t.y, res.x - t.x); res.x = t.x + Math.cos(angle) * (currentCollisionRadius + t.radius - 15); res.y = t.y + Math.sin(angle) * (currentCollisionRadius + t.radius - 15); }
             }
@@ -1464,8 +1529,9 @@
             player.animRot += (targetRot - player.animRot) * 0.3; player.animOffsetY += (targetOffsetY - player.animOffsetY) * 0.3; player.animSqueezeX += (targetSqueezeX - player.animSqueezeX) * 0.3; player.animSqueezeY += (targetSqueezeY - player.animSqueezeY) * 0.3;
             
             if(!isNaN(player.animOffsetY) && !isNaN(player.animRot)) {
-                containerEl.style.transform = `translate(${player.x - camera.x}px, ${player.y - camera.y}px) translate(-50%, -50%)`;
-                let faceFlip = player.facingRight ? -1 : 1; spriteEl.style.transform = `translate(0px, ${player.animOffsetY}px) scale(${player.animSqueezeX * faceFlip}, ${player.animSqueezeY}) rotate(${player.animRot}deg)`;
+                // Tối ưu Translate3D bằng GPU
+                containerEl.style.transform = `translate3d(${player.x - camera.x}px, ${player.y - camera.y}px, 0) translate(-50%, -50%)`;
+                let faceFlip = player.facingRight ? -1 : 1; spriteEl.style.transform = `translate3d(0px, ${player.animOffsetY}px, 0) scale(${player.animSqueezeX * faceFlip}, ${player.animSqueezeY}) rotate(${player.animRot}deg)`;
             }
 
             for (let i = mobs.length - 1; i >= 0; i--) {
@@ -1530,17 +1596,22 @@
 
                 let mRes = mob;
                 for (let t of trees) {
+                    // Tối ưu AABB
+                    if (Math.abs(mRes.x - t.x) > 100 || Math.abs(mRes.y - t.y) > 100) continue;
                     const dist = Math.hypot(mRes.x - t.x, mRes.y - t.y);
                     if (dist < mRes.radius + t.radius - 15) { const angle = Math.atan2(mRes.y - t.y, mRes.x - t.x); mRes.x = t.x + Math.cos(angle) * (mRes.radius + t.radius - 15); mRes.y = t.y + Math.sin(angle) * (mRes.radius + t.radius - 15); }
                 }
 
                 if (mob.x > camera.x - 200 && mob.x < camera.x + canvas.width + 200 && mob.y > camera.y - 200 && mob.y < camera.y + canvas.height + 200) {
-                    mob.element.style.display = 'block'; mob.element.style.transform = `translate(${mob.x - camera.x}px, ${mob.y - camera.y}px) translate(-50%, -50%)`;
+                    mob.element.style.display = 'block'; 
+                    // Tối ưu GPU
+                    mob.element.style.transform = `translate3d(${mob.x - camera.x}px, ${mob.y - camera.y}px, 0) translate(-50%, -50%)`;
                     
                     if(!mob.isFlashing && mob.imgElement) {
                         let filterStr = '';
                         if(mob.isElite) filterStr += 'drop-shadow(0 0 15px rgba(231,76,60,0.8)) ';
                         filterStr += `brightness(${1 - globalDarkAlpha * 0.6})`;
+                        // Use inline style for mobs as they move too frequently for setTimeout throttling
                         mob.imgElement.style.filter = filterStr;
                     }
                 } else { mob.element.style.display = 'none'; }
@@ -1560,13 +1631,26 @@
                 let isPierceR = (p.type === 'shuriken' || p.type === 'fire' || p.type === 'boss_laser' || p.type === 'aura_sphere' || p.type === 'shadow_ball' || p.type === 'frost' || p.type === 'rock_throw' || p.type === 'energy_ball' || p.type === 'leaf' || p.type === 'solar_beam' || p.type === 'hydro_pump' || p.type === 'snipe_shot' || p.type === 'hydro_cannon' || p.type === 'dragon_pulse') && p.life !== undefined;
                 
                 let hitTree = false, passedTree = null;
-                if (!isSpecial) { for(let t of trees) { if (Math.hypot(p.x - t.x, p.y - t.y) < p.radius + t.radius - 20) { hitTree = true; break; } } } 
-                else { for(let t of trees) { if (Math.hypot(p.x - t.x, p.y - t.y) < p.radius + t.radius - 20) { passedTree = t; break; } } if (passedTree) { visualEffects.push({ x: passedTree.x, y: passedTree.y, type: 'tree-glow', life: 25 }); } }
+                if (!isSpecial) { 
+                    for(let t of trees) { 
+                        if (Math.abs(p.x - t.x) > 100 || Math.abs(p.y - t.y) > 100) continue; // Tối ưu AABB
+                        if (Math.hypot(p.x - t.x, p.y - t.y) < p.radius + t.radius - 20) { hitTree = true; break; } 
+                    } 
+                } 
+                else { 
+                    for(let t of trees) { 
+                        if (Math.abs(p.x - t.x) > 150 || Math.abs(p.y - t.y) > 150) continue; // Tối ưu AABB
+                        if (Math.hypot(p.x - t.x, p.y - t.y) < p.radius + t.radius - 20) { passedTree = t; break; } 
+                    } 
+                    if (passedTree) { visualEffects.push({ x: passedTree.x, y: passedTree.y, type: 'tree-glow', life: 25 }); } 
+                }
                 if (hitTree) { projectiles.splice(i, 1); continue; }
                 
                 let hitMob = false;
                 for(let mob of mobs) {
-                    if (!mob.isDead && Math.hypot(p.x - mob.x, p.y - mob.y) < p.radius + mob.radius) {
+                    if (mob.isDead) continue;
+                    if (Math.abs(p.x - mob.x) > 200 || Math.abs(p.y - mob.y) > 200) continue; // Tối ưu AABB
+                    if (Math.hypot(p.x - mob.x, p.y - mob.y) < p.radius + mob.radius) {
                         if (isPierceR) { if (!p.piercedMobs.includes(mob.id)) { takeMobDamage(mob, p.dmg, false); p.piercedMobs.push(mob.id); } } 
                         else { takeMobDamage(mob, p.dmg, false); hitMob = true; break; }
                     }
@@ -1694,44 +1778,53 @@
                 ctx.shadowBlur = 0; 
                 trees.forEach(t => {
                     if (t.x > camera.x - 100 && t.x < camera.x + canvas.width + 100 && t.y > camera.y - 100 && t.y < camera.y + canvas.height + 100) {
-                        ctx.save(); ctx.translate(t.x, t.y);
-                        ctx.beginPath(); ctx.ellipse(0, t.radius * 0.7, t.radius * 0.9, t.radius * 0.5, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fill(); 
-                        if (t.type === 'bush' || t.type === 'flower') {
-                            let grad = ctx.createRadialGradient(0, 0, t.radius*0.2, 0, 0, t.radius); grad.addColorStop(0, t.c2); grad.addColorStop(1, t.c1);
-                            ctx.beginPath(); ctx.arc(0, 0, t.radius, 0, Math.PI*2); ctx.fillStyle = grad; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = t.c3; ctx.stroke();
-                            if(t.type === 'flower') { ctx.fillStyle = t.c3; for(let f=0; f<5; f++){ let a=f*Math.PI*2/5; ctx.beginPath(); ctx.arc(Math.cos(a)*t.radius*0.5, Math.sin(a)*t.radius*0.5, t.radius*0.25, 0, Math.PI*2); ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle=t.c2; ctx.stroke(); } }
-                        } else if (t.type === 'pine') {
-                            ctx.fillStyle = '#6d4c2c'; ctx.fillRect(-t.radius*0.18, 0, t.radius*0.36, t.radius);
-                            ctx.strokeStyle = '#4e342e'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-t.radius*0.1, t.radius*0.2); ctx.lineTo(-t.radius*0.1, t.radius*0.8); ctx.moveTo(t.radius*0.1, t.radius*0.2); ctx.lineTo(t.radius*0.1, t.radius*0.8); ctx.stroke();
-                            let grad = ctx.createLinearGradient(0, -t.radius, 0, t.radius*0.2); grad.addColorStop(0, t.c1); grad.addColorStop(1, t.c2);
-                            for(let i=0; i<4; i++){ let w = t.radius - i*t.radius*0.2; let yt = -t.radius*0.2 - i*t.radius*0.4; ctx.beginPath(); ctx.moveTo(0, yt-t.radius); ctx.lineTo(-w, yt+t.radius*0.5); ctx.lineTo(w, yt+t.radius*0.5); ctx.fillStyle = grad; ctx.fill(); }
-                        } else if (t.type === 'mushroom') {
-                            let grad = ctx.createLinearGradient(0, 0, 0, t.radius*0.8); grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#e1d7c6');
-                            ctx.fillStyle = grad; ctx.fillRect(-t.radius*0.2, 0, t.radius*0.4, t.radius*0.8);
-                            let grad2 = ctx.createRadialGradient(0, -t.radius*0.2, t.radius*0.2, 0, 0, t.radius); grad2.addColorStop(0, t.c2); grad2.addColorStop(1, t.c3);
-                            ctx.beginPath(); ctx.arc(0, 0, t.radius, Math.PI, 0); ctx.fillStyle = grad2; ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-t.radius*0.4, -t.radius*0.4, t.radius*0.15, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(t.radius*0.3, -t.radius*0.6, t.radius*0.1, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(0, -t.radius*0.2, t.radius*0.2, 0, Math.PI*2); ctx.fill();
-                        } else if (t.type === 'cactus') {
-                            let grad = ctx.createLinearGradient(0, t.radius, 0, -t.radius); grad.addColorStop(0, t.c1); grad.addColorStop(1, t.c2);
-                            ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle=grad; ctx.lineWidth=t.radius*0.5; ctx.beginPath(); ctx.moveTo(0,t.radius); ctx.lineTo(0,-t.radius); ctx.stroke();
-                            ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-t.radius*0.6,0); ctx.lineTo(-t.radius*0.6,-t.radius*0.5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,t.radius*0.3); ctx.lineTo(t.radius*0.6,t.radius*0.3); ctx.lineTo(t.radius*0.6,-t.radius*0.3); ctx.stroke();
-                        } else if (t.type === 'rock') {
-                            let grad = ctx.createRadialGradient(0, 0, t.radius*0.3, 0, 0, t.radius); grad.addColorStop(0, t.c2); grad.addColorStop(1, t.c1);
-                            ctx.fillStyle=grad; ctx.beginPath(); for(let i=0;i<8;i++){ let a=i*Math.PI*2/8; let r=t.radius*(0.7+(i%2===0?0.3:0)); ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r); } ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = t.c3; ctx.stroke();
-                            ctx.fillStyle=t.c2; ctx.beginPath(); ctx.moveTo(0,-t.radius*0.5); ctx.lineTo(-t.radius*0.5,0); ctx.lineTo(0,t.radius*0.5); ctx.fill();
-                        } else if (t.type === 'dead_tree') {
-                            ctx.strokeStyle=t.c1; ctx.lineWidth=t.radius*0.3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,t.radius); ctx.lineTo(0,-t.radius); ctx.stroke();
-                            ctx.strokeStyle=t.c2; ctx.lineWidth=t.radius*0.12; ctx.beginPath(); ctx.moveTo(0,-t.radius*0.5); ctx.lineTo(-t.radius*0.5,-t.radius*0.8); ctx.moveTo(0,-t.radius*0.7); ctx.lineTo(t.radius*0.4,-t.radius*1.1); ctx.stroke();
-                            ctx.lineWidth=t.radius*0.15; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-t.radius*0.8,-t.radius*0.5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,-t.radius*0.4); ctx.lineTo(t.radius*0.7,-t.radius*0.8); ctx.stroke();
-                        } else if (t.type === 'crystal') {
-                            ctx.fillStyle=t.c2; ctx.beginPath(); ctx.moveTo(0,-t.radius*1.2); ctx.lineTo(t.radius*0.5,0); ctx.lineTo(0,t.radius); ctx.lineTo(-t.radius*0.5,0); ctx.fill();
-                            ctx.fillStyle=t.c3; ctx.beginPath(); ctx.moveTo(0,-t.radius*1.2); ctx.lineTo(t.radius*0.2,0); ctx.lineTo(0,t.radius); ctx.fill();
-                        } else if (t.type === 'energy_node') {
-                            ctx.fillStyle=t.c2; ctx.beginPath(); ctx.moveTo(0,-t.radius); ctx.lineTo(t.radius*0.7,0); ctx.lineTo(0,t.radius); ctx.lineTo(-t.radius*0.7,0); ctx.fill();
-                            ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,t.radius*0.25,0,Math.PI*2); ctx.fill();
-                        } else if (t.type === 'dry_bush') {
-                            ctx.fillStyle=t.c1; ctx.beginPath(); for(let i=0;i<16;i++){ let a=i*Math.PI*2/16; let r=t.radius*(0.6+Math.random()*0.5); ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r); } ctx.fill();
+                        
+                        const cacheKey = `${t.type}_${t.radius}_${t.c1}_${t.c2}_${t.c3}`;
+                        const cached = objCache[cacheKey];
+
+                        if (cached && cached.img) {
+                             ctx.drawImage(cached.img, t.x - cached.offset, t.y - cached.offset);
+                        } else {
+                            // Fallback to direct draw if not cached
+                            ctx.save(); ctx.translate(t.x, t.y);
+                            ctx.beginPath(); ctx.ellipse(0, t.radius * 0.7, t.radius * 0.9, t.radius * 0.5, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fill(); 
+                            if (t.type === 'bush' || t.type === 'flower') {
+                                let grad = ctx.createRadialGradient(0, 0, t.radius*0.2, 0, 0, t.radius); grad.addColorStop(0, t.c2); grad.addColorStop(1, t.c1);
+                                ctx.beginPath(); ctx.arc(0, 0, t.radius, 0, Math.PI*2); ctx.fillStyle = grad; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = t.c3; ctx.stroke();
+                                if(t.type === 'flower') { ctx.fillStyle = t.c3; for(let f=0; f<5; f++){ let a=f*Math.PI*2/5; ctx.beginPath(); ctx.arc(Math.cos(a)*t.radius*0.5, Math.sin(a)*t.radius*0.5, t.radius*0.25, 0, Math.PI*2); ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle=t.c2; ctx.stroke(); } }
+                            } else if (t.type === 'pine') {
+                                ctx.fillStyle = '#6d4c2c'; ctx.fillRect(-t.radius*0.18, 0, t.radius*0.36, t.radius);
+                                ctx.strokeStyle = '#4e342e'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-t.radius*0.1, t.radius*0.2); ctx.lineTo(-t.radius*0.1, t.radius*0.8); ctx.moveTo(t.radius*0.1, t.radius*0.2); ctx.lineTo(t.radius*0.1, t.radius*0.8); ctx.stroke();
+                                let grad = ctx.createLinearGradient(0, -t.radius, 0, t.radius*0.2); grad.addColorStop(0, t.c1); grad.addColorStop(1, t.c2);
+                                for(let i=0; i<4; i++){ let w = t.radius - i*t.radius*0.2; let yt = -t.radius*0.2 - i*t.radius*0.4; ctx.beginPath(); ctx.moveTo(0, yt-t.radius); ctx.lineTo(-w, yt+t.radius*0.5); ctx.lineTo(w, yt+t.radius*0.5); ctx.fillStyle = grad; ctx.fill(); }
+                            } else if (t.type === 'mushroom') {
+                                let grad = ctx.createLinearGradient(0, 0, 0, t.radius*0.8); grad.addColorStop(0, '#fff'); grad.addColorStop(1, '#e1d7c6');
+                                ctx.fillStyle = grad; ctx.fillRect(-t.radius*0.2, 0, t.radius*0.4, t.radius*0.8);
+                                let grad2 = ctx.createRadialGradient(0, -t.radius*0.2, t.radius*0.2, 0, 0, t.radius); grad2.addColorStop(0, t.c2); grad2.addColorStop(1, t.c3);
+                                ctx.beginPath(); ctx.arc(0, 0, t.radius, Math.PI, 0); ctx.fillStyle = grad2; ctx.fill(); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-t.radius*0.4, -t.radius*0.4, t.radius*0.15, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(t.radius*0.3, -t.radius*0.6, t.radius*0.1, 0, Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.arc(0, -t.radius*0.2, t.radius*0.2, 0, Math.PI*2); ctx.fill();
+                            } else if (t.type === 'cactus') {
+                                let grad = ctx.createLinearGradient(0, t.radius, 0, -t.radius); grad.addColorStop(0, t.c1); grad.addColorStop(1, t.c2);
+                                ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle=grad; ctx.lineWidth=t.radius*0.5; ctx.beginPath(); ctx.moveTo(0,t.radius); ctx.lineTo(0,-t.radius); ctx.stroke();
+                                ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-t.radius*0.6,0); ctx.lineTo(-t.radius*0.6,-t.radius*0.5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,t.radius*0.3); ctx.lineTo(t.radius*0.6,t.radius*0.3); ctx.lineTo(t.radius*0.6,-t.radius*0.3); ctx.stroke();
+                            } else if (t.type === 'rock') {
+                                let grad = ctx.createRadialGradient(0, 0, t.radius*0.3, 0, 0, t.radius); grad.addColorStop(0, t.c2); grad.addColorStop(1, t.c1);
+                                ctx.fillStyle=grad; ctx.beginPath(); for(let i=0;i<8;i++){ let a=i*Math.PI*2/8; let r=t.radius*(0.7+(i%2===0?0.3:0)); ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r); } ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = t.c3; ctx.stroke();
+                                ctx.fillStyle=t.c2; ctx.beginPath(); ctx.moveTo(0,-t.radius*0.5); ctx.lineTo(-t.radius*0.5,0); ctx.lineTo(0,t.radius*0.5); ctx.fill();
+                            } else if (t.type === 'dead_tree') {
+                                ctx.strokeStyle=t.c1; ctx.lineWidth=t.radius*0.3; ctx.lineCap='round'; ctx.beginPath(); ctx.moveTo(0,t.radius); ctx.lineTo(0,-t.radius); ctx.stroke();
+                                ctx.strokeStyle=t.c2; ctx.lineWidth=t.radius*0.12; ctx.beginPath(); ctx.moveTo(0,-t.radius*0.5); ctx.lineTo(-t.radius*0.5,-t.radius*0.8); ctx.moveTo(0,-t.radius*0.7); ctx.lineTo(t.radius*0.4,-t.radius*1.1); ctx.stroke();
+                                ctx.lineWidth=t.radius*0.15; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-t.radius*0.8,-t.radius*0.5); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,-t.radius*0.4); ctx.lineTo(t.radius*0.7,-t.radius*0.8); ctx.stroke();
+                            } else if (t.type === 'crystal') {
+                                ctx.fillStyle=t.c2; ctx.beginPath(); ctx.moveTo(0,-t.radius*1.2); ctx.lineTo(t.radius*0.5,0); ctx.lineTo(0,t.radius); ctx.lineTo(-t.radius*0.5,0); ctx.fill();
+                                ctx.fillStyle=t.c3; ctx.beginPath(); ctx.moveTo(0,-t.radius*1.2); ctx.lineTo(t.radius*0.2,0); ctx.lineTo(0,t.radius); ctx.fill();
+                            } else if (t.type === 'energy_node') {
+                                ctx.fillStyle=t.c2; ctx.beginPath(); ctx.moveTo(0,-t.radius); ctx.lineTo(t.radius*0.7,0); ctx.lineTo(0,t.radius); ctx.lineTo(-t.radius*0.7,0); ctx.fill();
+                                ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(0,0,t.radius*0.25,0,Math.PI*2); ctx.fill();
+                            } else if (t.type === 'dry_bush') {
+                                ctx.fillStyle=t.c1; ctx.beginPath(); for(let i=0;i<16;i++){ let a=i*Math.PI*2/16; let r=t.radius*(0.6+Math.random()*0.5); ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r); } ctx.fill();
+                            }
+                            ctx.restore();
                         }
-                        ctx.restore();
                     }
                 });
 
@@ -1878,7 +1971,7 @@
                         }
                         else if (v.type === 'iron_tail') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/2, Math.PI/2); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(189, 195, 199, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'fire_kick') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 100 + (15-v.life)*2, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = `rgba(231, 76, 60, ${v.life/15})`; ctx.lineWidth = 35; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 70 + (15-v.life), -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(241, 196, 15, ${v.life/15})`; ctx.lineWidth = 15; ctx.stroke(); ctx.restore(); }
-                        else if (v.type === 'basic_cut') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(52, 152, 219, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
+                        else if(v.type === 'basic_cut') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 130, -Math.PI/2.5, Math.PI/2.5); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(52, 152, 219, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, 110, -Math.PI/4, Math.PI/4); ctx.strokeStyle = `rgba(255, 255, 255, ${v.life/15})`; ctx.lineWidth = 10; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'aura_punch') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 100, -Math.PI/3, Math.PI/3); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(41, 128, 185, ${v.life/15})`; ctx.lineWidth = 40; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'fire_claw') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 140, -Math.PI/3, Math.PI/3); ctx.strokeStyle = `rgba(230, 126, 34, ${v.life/15})`; ctx.lineWidth = 30; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
                         else if (v.type === 'dragon_tail') { ctx.save(); ctx.translate(v.x, v.y); ctx.rotate(v.angle); ctx.beginPath(); ctx.arc(0, 0, 150, -Math.PI/2, Math.PI/2); ctx.strokeStyle = v.isRed ? `rgba(231, 76, 60, ${v.life/15})` : `rgba(243, 156, 18, ${v.life/15})`; ctx.lineWidth = 25; ctx.lineCap = 'round'; ctx.stroke(); ctx.restore(); }
